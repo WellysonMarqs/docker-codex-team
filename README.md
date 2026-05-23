@@ -25,7 +25,7 @@ Este projeto usa o Docker Agent oficial. O arquivo `agents.yml` define o time mu
 Modo de execução escolhido:
 
 - Docker Agent usa Docker Model Runner local como provider principal.
-- O modelo local configurado é `local-qwen`, apontando para `ai/qwen3:14B`.
+- O modelo local configurado é `local-qwen`, apontando para `ai/qwen3:14B-Q6_K`.
 - O `root` atua como `coordinator`.
 - Quando necessário, o coordinator pode chamar o Codex CLI local via shell usando `codex exec`.
 - O Codex CLI deve estar autenticado localmente, por exemplo via ChatGPT Plus no ambiente do usuário.
@@ -47,7 +47,7 @@ docker desktop enable model-runner
 Baixar o modelo local, se ainda não existir:
 
 ```bash
-docker model pull ai/qwen3:14B
+docker model pull ai/qwen3:14B-Q6_K
 ```
 
 Executar o time:

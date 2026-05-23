@@ -44,7 +44,7 @@ Status: Concluida.
 - [x] Configurar Docker Model Runner local como provider principal.
 - [x] Configurar Codex CLI como ferramenta auxiliar via shell.
 - [ ] Validar Docker Model Runner habilitado localmente.
-- [ ] Validar modelo `ai/qwen3:14B` disponivel localmente.
+- [ ] Validar modelo `ai/qwen3:14B-Q6_K` disponivel localmente.
 - [ ] Validar `docker agent run agents.yml --dry-run` apos habilitar Docker Model Runner.
 - [x] Atualizar `ARCHITECTURE.md`.
 - [x] Atualizar `DECISIONS.md`.
@@ -279,7 +279,7 @@ Criterios de aceite:
 - [ ] Arquitetura final mantida como pendente ate o escopo.
 - [x] Docker Agent oficial validado localmente para configuracao e toolsets.
 - [ ] Docker Model Runner habilitado.
-- [ ] Modelo local `ai/qwen3:14B` disponivel.
+- [ ] Modelo local `ai/qwen3:14B-Q6_K` disponivel.
 - [x] Codex CLI instalado localmente.
 
 ### TASK-001A: Validar Docker Agent oficial
@@ -313,8 +313,8 @@ Criterios de aceite:
 
 - [ ] `docker desktop enable model-runner` executado no ambiente do usuario.
 - [ ] `docker model version` mostra server acessivel.
-- [ ] `docker model pull ai/qwen3:14B` executa com sucesso.
-- [ ] `docker model list` mostra `ai/qwen3:14B`.
+- [ ] `docker model pull ai/qwen3:14B-Q6_K` executa com sucesso.
+- [ ] `docker model list` mostra `ai/qwen3:14B-Q6_K`.
 - [ ] `docker agent run agents.yml --dry-run` executa sem `OPENAI_API_KEY`.
 - [ ] `docker agent run agents.yml` inicia usando Docker Model Runner local.
 

@@ -108,7 +108,7 @@ Regra operacional:
 - `architect`, `backend_dev` e `frontend_dev` devem atuar dentro dos limites definidos em `agents.yml`.
 - O Docker Agent gerencia a coordenacao e as delegacoes.
 - O provider principal do Docker Agent e Docker Model Runner local.
-- O modelo local configurado e `local-qwen`, apontando para `ai/qwen3:14B`.
+- O modelo local configurado e `local-qwen`, apontando para `ai/qwen3:14B-Q6_K`.
 - O Codex CLI local pode ser chamado via shell pelo coordinator quando uma tarefa exigir apoio especializado de coding, revisao, refatoracao ou validacao tecnica.
 - O Codex CLI nao substitui o workflow multi-agent; ele e uma ferramenta auxiliar chamada sob demanda.
 - Nenhuma implementacao deve iniciar sem escopo, arquitetura aprovada e tarefa rastreavel.
