@@ -39,10 +39,13 @@ Status: Concluida.
 - [x] Configurar Docker Agent oficial a partir de `agents.yml`.
 - [x] Definir `coordinator` como orquestrador principal.
 - [x] Validar `docker agent debug config agents.yml`.
-- [x] Validar `docker agent run agents.yml --dry-run`.
-- [x] Validar `docker agent run agents.yml --agent coordinator --dry-run`.
 - [x] Validar toolsets com `docker agent debug toolsets agents.yml`.
 - [ ] Validar build de imagem quando a CLI local expuser `docker agent build`.
+- [x] Configurar Docker Model Runner local como provider principal.
+- [x] Configurar Codex CLI como ferramenta auxiliar via shell.
+- [ ] Validar Docker Model Runner habilitado localmente.
+- [ ] Validar modelo `ai/qwen3:14B` disponivel localmente.
+- [ ] Validar `docker agent run agents.yml --dry-run` apos habilitar Docker Model Runner.
 - [x] Atualizar `ARCHITECTURE.md`.
 - [x] Atualizar `DECISIONS.md`.
 - [x] Atualizar `TASKS.md`.
@@ -274,7 +277,10 @@ Criterios de aceite:
 - [ ] PostgreSQL confirmado.
 - [ ] Angular estavel confirmado.
 - [ ] Arquitetura final mantida como pendente ate o escopo.
-- [x] Docker Agent oficial validado localmente para configuracao, dry-run e toolsets.
+- [x] Docker Agent oficial validado localmente para configuracao e toolsets.
+- [ ] Docker Model Runner habilitado.
+- [ ] Modelo local `ai/qwen3:14B` disponivel.
+- [x] Codex CLI instalado localmente.
 
 ### TASK-001A: Validar Docker Agent oficial
 
@@ -285,15 +291,32 @@ Status: Pendente.
 Criterios de aceite:
 
 - [x] `docker agent debug config agents.yml` executa com sucesso.
-- [x] `docker agent run agents.yml --dry-run` executa com sucesso.
+- [ ] `docker agent run agents.yml --dry-run` executa com sucesso apos Docker Model Runner estar rodando.
 - [ ] `docker agent run agents.yml` inicia o root/coordinator.
-- [x] `docker agent run agents.yml --agent coordinator --dry-run` inicia o coordinator explicito em dry-run.
+- [ ] `docker agent run agents.yml --agent coordinator --dry-run` inicia o coordinator explicito em dry-run apos Docker Model Runner estar rodando.
 - [x] `docker agent debug toolsets agents.yml` lista ferramentas dos agentes.
 - [ ] `docker agent build agents.yml docker-codex-team-agent:latest` gera a imagem do agente quando disponivel na CLI local.
 - [x] Todos os agentes usam `agents.yml` como fonte de instrucao.
+- [x] `agents.yml` usa Docker Model Runner local como provider principal.
+- [x] `agents.yml` orienta o coordinator a chamar Codex CLI via shell quando necessario.
 
 Observacao:
-A CLI local validada e `docker agent v1.57.0`. Ela suporta `run`, `debug config` e `debug toolsets`, mas nao expoe `build` nesta instalacao, apesar de a documentacao oficial atual listar esse comando.
+A CLI local validada e `docker agent v1.57.0`. Ela suporta `run`, `debug config` e `debug toolsets`, mas nao expoe `build` nesta instalacao, apesar de a documentacao oficial atual listar esse comando. O `run --dry-run` com `local-qwen` tenta acessar o Docker Model Runner; neste ambiente ele falha enquanto o Model Runner nao estiver habilitado.
+
+### TASK-001B: Habilitar Docker Model Runner local
+
+Responsavel: usuario e `coordinator`.
+
+Status: Pendente.
+
+Criterios de aceite:
+
+- [ ] `docker desktop enable model-runner` executado no ambiente do usuario.
+- [ ] `docker model version` mostra server acessivel.
+- [ ] `docker model pull ai/qwen3:14B` executa com sucesso.
+- [ ] `docker model list` mostra `ai/qwen3:14B`.
+- [ ] `docker agent run agents.yml --dry-run` executa sem `OPENAI_API_KEY`.
+- [ ] `docker agent run agents.yml` inicia usando Docker Model Runner local.
 
 ### TASK-002: Receber e documentar escopo detalhado
 

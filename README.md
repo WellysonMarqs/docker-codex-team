@@ -22,6 +22,34 @@ Enviar o escopo detalhado do problema que o projeto ira resolver. A partir desse
 
 Este projeto usa o Docker Agent oficial. O arquivo `agents.yml` define o time multi-agent.
 
+Modo de execução escolhido:
+
+- Docker Agent usa Docker Model Runner local como provider principal.
+- O modelo local configurado é `local-qwen`, apontando para `ai/qwen3:14B`.
+- O `root` atua como `coordinator`.
+- Quando necessário, o coordinator pode chamar o Codex CLI local via shell usando `codex exec`.
+- O Codex CLI deve estar autenticado localmente, por exemplo via ChatGPT Plus no ambiente do usuário.
+
+Pré-requisitos:
+
+```bash
+docker agent version
+docker model version
+codex --version
+```
+
+Habilitar Docker Model Runner:
+
+```bash
+docker desktop enable model-runner
+```
+
+Baixar o modelo local, se ainda não existir:
+
+```bash
+docker model pull ai/qwen3:14B
+```
+
 Executar o time:
 
 ```bash
@@ -51,6 +79,18 @@ Validar a configuração sem iniciar uma sessão real:
 ```bash
 docker agent debug config agents.yml
 docker agent run agents.yml --dry-run
+```
+
+Validar toolsets:
+
+```bash
+docker agent debug toolsets agents.yml
+```
+
+Exemplo de chamada do Codex CLI pelo coordinator via shell:
+
+```bash
+codex exec --cd . --sandbox workspace-write --skip-git-repo-check "Revise as alterações atuais com foco em bugs, riscos, arquitetura e testes. Não altere arquivos."
 ```
 
 Gerar uma imagem Docker do agente, quando sua versão do Docker Agent suportar o comando `build`:

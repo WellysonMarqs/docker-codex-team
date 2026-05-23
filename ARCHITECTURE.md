@@ -107,7 +107,23 @@ Regra operacional:
 - O `root` atua como coordinator e delega tarefas por `sub_agents`.
 - `architect`, `backend_dev` e `frontend_dev` devem atuar dentro dos limites definidos em `agents.yml`.
 - O Docker Agent gerencia a coordenacao e as delegacoes.
+- O provider principal do Docker Agent e Docker Model Runner local.
+- O modelo local configurado e `local-qwen`, apontando para `ai/qwen3:14B`.
+- O Codex CLI local pode ser chamado via shell pelo coordinator quando uma tarefa exigir apoio especializado de coding, revisao, refatoracao ou validacao tecnica.
+- O Codex CLI nao substitui o workflow multi-agent; ele e uma ferramenta auxiliar chamada sob demanda.
 - Nenhuma implementacao deve iniciar sem escopo, arquitetura aprovada e tarefa rastreavel.
+
+Fluxo hibrido:
+
+```text
+Docker Agent
+  -> Docker Model Runner local
+  -> root/coordinator
+      -> architect
+      -> backend_dev
+      -> frontend_dev
+      -> shell: codex exec ... quando necessario
+```
 
 ### 4.3 Fluxo obrigatorio
 
