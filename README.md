@@ -20,35 +20,46 @@ Enviar o escopo detalhado do problema que o projeto ira resolver. A partir desse
 
 ## Docker Agent
 
-O runtime Docker usa `agents.yml` como fonte dos papeis e inicia o `coordinator` como orquestrador principal.
+Este projeto usa o Docker Agent oficial. O arquivo `agents.yml` define o time multi-agent.
 
-Build da imagem:
-
-```bash
-docker compose build coordinator
-```
-
-Executar o coordinator:
+Executar o time:
 
 ```bash
-docker compose run --rm coordinator "Analise o escopo do projeto e coordene os agentes conforme o workflow."
+docker agent run agents.yml
 ```
 
-Validar sem consumir uma execucao real do Codex:
+O agente `root` atua como `coordinator` e pode delegar tarefas para:
+
+- `architect`
+- `backend_dev`
+- `frontend_dev`
+
+Executar com prompt inicial:
 
 ```bash
-docker compose run --rm -e DRY_RUN=1 coordinator "Teste de roteamento"
+docker agent run agents.yml "Analise o estado atual do projeto e conduza o workflow multi-agent."
 ```
 
-Executar um agente especializado manualmente, apenas quando o coordinator delegar:
+Executar explicitamente o coordinator:
 
 ```bash
-docker compose --profile agents run --rm architect "Analise o problema e proponha alternativas arquiteturais."
-docker compose --profile agents run --rm backend_dev "Execute a tarefa backend aprovada."
-docker compose --profile agents run --rm frontend_dev "Execute a tarefa frontend aprovada."
+docker agent run agents.yml --agent coordinator
 ```
 
-O diretorio atual e montado em `/workspace`, e o `CODEX_HOME` local e montado em `/codex-home` para reutilizar autenticacao e configuracao do Codex.
+Validar a configuração sem iniciar uma sessão real:
+
+```bash
+docker agent debug config agents.yml
+docker agent run agents.yml --dry-run
+```
+
+Gerar uma imagem Docker do agente, quando sua versão do Docker Agent suportar o comando `build`:
+
+```bash
+docker agent build agents.yml docker-codex-team-agent:latest
+```
+
+Observação: a CLI local validada neste workspace é `docker agent v1.57.0`; ela executa `run`, `debug config` e `debug toolsets`, mas não expõe `build` nesta instalação.
 
 ## Documentos
 

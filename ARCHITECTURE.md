@@ -87,23 +87,27 @@ Versao sugerida no planejamento atual:
 - `backend_dev`: implementa backend somente apos aprovacao da arquitetura e dos contratos.
 - `frontend_dev`: implementa frontend somente apos aprovacao da estrategia de UX, arquitetura frontend e contratos.
 
-### 4.2 Runtime Docker Agent
+### 4.2 Docker Agent Oficial
 
-O projeto possui um runtime Docker para carregar os agentes definidos em `agents.yml`.
+O projeto usa o Docker Agent oficial para carregar os agentes definidos em `agents.yml`.
 
-Componentes:
+Formato operacional:
 
-- `Dockerfile`: cria a imagem `docker-codex-team-agent:local` com Codex CLI, Python e suporte a YAML.
-- `docker-compose.yml`: define o servico principal `coordinator` e os servicos especializados `architect`, `backend_dev` e `frontend_dev` sob profile `agents`.
-- `scripts/render_agent_prompt.py`: le `agents.yml`, `AGENTS.md` e documentos obrigatorios para montar o prompt operacional de cada agente.
-- `scripts/run-agent.sh`: seleciona o agente, renderiza o prompt e inicia o Codex CLI.
+- `agents.yml` e o arquivo de configuracao do time multi-agent.
+- `root` e o agente de entrada padrao exigido para `docker agent run agents.yml`.
+- O comportamento do `root` e o de `coordinator`.
+- `coordinator` tambem existe como agente explicito para execucao com `--agent coordinator`.
+- `architect`, `backend_dev` e `frontend_dev` sao sub-agentes especializados.
+- Os documentos obrigatorios sao adicionados ao contexto via `add_prompt_files`.
+- Os agentes usam toolsets oficiais como `filesystem`, `shell`, `think` e `todo`.
 
 Regra operacional:
 
-- O `coordinator` e o ponto de entrada padrao.
-- `architect`, `backend_dev` e `frontend_dev` podem ser executados manualmente apenas quando houver delegacao clara.
-- Todos os agentes usam `agents.yml` como fonte primaria de papel, instrucao e orquestracao.
-- O runtime nao substitui o workflow: ele apenas executa os papeis definidos.
+- O comando principal e `docker agent run agents.yml`.
+- O `root` atua como coordinator e delega tarefas por `sub_agents`.
+- `architect`, `backend_dev` e `frontend_dev` devem atuar dentro dos limites definidos em `agents.yml`.
+- O Docker Agent gerencia a coordenacao e as delegacoes.
+- Nenhuma implementacao deve iniciar sem escopo, arquitetura aprovada e tarefa rastreavel.
 
 ### 4.3 Fluxo obrigatorio
 

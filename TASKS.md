@@ -36,13 +36,13 @@ Status: Concluida.
 - [x] Gerar planejamento inicial.
 - [x] Ajustar stack obrigatoria para Java 17, Spring Boot, PostgreSQL e Angular.
 - [x] Registrar que a arquitetura final depende do escopo detalhado do problema.
-- [x] Configurar Docker agent a partir de `agents.yml`.
+- [x] Configurar Docker Agent oficial a partir de `agents.yml`.
 - [x] Definir `coordinator` como orquestrador principal.
-- [x] Validar build da imagem Docker.
-- [x] Validar `coordinator` via Docker em modo `DRY_RUN`.
-- [x] Validar `architect` via Docker em modo `DRY_RUN`.
-- [x] Validar `backend_dev` via Docker em modo `DRY_RUN`.
-- [x] Validar `frontend_dev` via Docker em modo `DRY_RUN`.
+- [x] Validar `docker agent debug config agents.yml`.
+- [x] Validar `docker agent run agents.yml --dry-run`.
+- [x] Validar `docker agent run agents.yml --agent coordinator --dry-run`.
+- [x] Validar toolsets com `docker agent debug toolsets agents.yml`.
+- [ ] Validar build de imagem quando a CLI local expuser `docker agent build`.
 - [x] Atualizar `ARCHITECTURE.md`.
 - [x] Atualizar `DECISIONS.md`.
 - [x] Atualizar `TASKS.md`.
@@ -274,22 +274,26 @@ Criterios de aceite:
 - [ ] PostgreSQL confirmado.
 - [ ] Angular estavel confirmado.
 - [ ] Arquitetura final mantida como pendente ate o escopo.
-- [x] Docker agent validado localmente.
+- [x] Docker Agent oficial validado localmente para configuracao, dry-run e toolsets.
 
-### TASK-001A: Validar runtime multi-agent Docker
+### TASK-001A: Validar Docker Agent oficial
 
 Responsavel: `coordinator`.
 
-Status: Concluida.
+Status: Pendente.
 
 Criterios de aceite:
 
-- [x] `docker compose build coordinator` executa com sucesso.
-- [x] `docker compose run --rm -e DRY_RUN=1 coordinator` carrega o papel `coordinator`.
-- [x] `docker compose --profile agents run --rm -e DRY_RUN=1 architect` carrega o papel `architect`.
-- [x] `docker compose --profile agents run --rm -e DRY_RUN=1 backend_dev` carrega o papel `backend_dev`.
-- [x] `docker compose --profile agents run --rm -e DRY_RUN=1 frontend_dev` carrega o papel `frontend_dev`.
+- [x] `docker agent debug config agents.yml` executa com sucesso.
+- [x] `docker agent run agents.yml --dry-run` executa com sucesso.
+- [ ] `docker agent run agents.yml` inicia o root/coordinator.
+- [x] `docker agent run agents.yml --agent coordinator --dry-run` inicia o coordinator explicito em dry-run.
+- [x] `docker agent debug toolsets agents.yml` lista ferramentas dos agentes.
+- [ ] `docker agent build agents.yml docker-codex-team-agent:latest` gera a imagem do agente quando disponivel na CLI local.
 - [x] Todos os agentes usam `agents.yml` como fonte de instrucao.
+
+Observacao:
+A CLI local validada e `docker agent v1.57.0`. Ela suporta `run`, `debug config` e `debug toolsets`, mas nao expoe `build` nesta instalacao, apesar de a documentacao oficial atual listar esse comando.
 
 ### TASK-002: Receber e documentar escopo detalhado
 

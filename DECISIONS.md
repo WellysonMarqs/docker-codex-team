@@ -214,29 +214,30 @@ Alternativas descartadas:
 - Escolher padroes por preferencia pessoal: descartado.
 - Implementar rapidamente sem analise: descartado.
 
-## ADR-009: Runtime Docker com coordinator como orquestrador
+## ADR-009: Docker Agent oficial com coordinator como orquestrador
 
 Status: Aceita.
 
 Decisao:
-Criar um runtime Docker baseado em `agents.yml`, com `coordinator` como ponto de entrada principal e `architect`, `backend_dev` e `frontend_dev` como agentes especializados executaveis sob demanda.
+Usar o Docker Agent oficial com `agents.yml` como configuracao do time multi-agent. O agente `root` atua como coordinator para permitir o comando padrao `docker agent run agents.yml`, e o agente `coordinator` tambem fica disponivel para execucao explicita.
 
 Motivo:
-O projeto precisa de um mecanismo operacional claro para materializar o workflow multi-agent definido na documentacao, mantendo uma unica fonte de verdade para papeis e instrucoes.
+O Docker Agent e o framework oficial da Docker para definir e executar times de agentes especializados por YAML, com delegacao via `sub_agents`.
 
 Beneficios:
-- padroniza a execucao dos agentes;
-- usa `agents.yml` como fonte primaria;
-- preserva o `coordinator` como orquestrador;
-- permite validar cada agente isoladamente;
-- evita misturar runtime de agentes com codigo da aplicacao.
+- segue a documentacao oficial da Docker;
+- usa `docker agent run agents.yml` como comando principal;
+- preserva `agents.yml` como fonte primaria;
+- permite delegacao hierarquica para architect, backend_dev e frontend_dev;
+- evita runtime customizado desnecessario;
+- permite gerar imagem com `docker agent build agents.yml`.
 
 Trade-offs:
-- o build da imagem depende de acesso a registries de Docker e npm;
-- a execucao real depende de autenticacao do Codex no `CODEX_HOME` montado;
-- a orquestracao logica ainda depende das instrucoes e do fluxo do `coordinator`.
+- depende do Docker Agent instalado no ambiente;
+- a execucao real depende de credenciais do provedor de modelo, como `OPENAI_API_KEY`;
+- o agente padrao precisa se chamar `root`, por isso o comportamento de coordinator fica nesse agente.
 
 Alternativas descartadas:
-- Rodar agentes sem Docker: descartado como caminho principal por reduzir padronizacao do ambiente.
-- Criar quatro imagens diferentes: descartado por duplicar runtime sem necessidade.
-- Implementar codigo de aplicacao junto com runtime: descartado para manter separacao de responsabilidades.
+- Runtime customizado com Dockerfile e Docker Compose: descartado porque o objetivo e usar o Docker Agent oficial.
+- Criar quatro imagens diferentes: descartado porque Docker Agent ja suporta time multi-agent em um unico YAML.
+- Implementar codigo de aplicacao junto com configuracao de agentes: descartado para manter separacao de responsabilidades.
