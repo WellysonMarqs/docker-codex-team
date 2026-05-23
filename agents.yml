@@ -1,6 +1,6 @@
 agents:
   root:
-    model: openai/gpt-5
+    model: local-qwen
     description: >
       Coordinator principal e orquestrador do time multi-agent. Atua como
       Engineering Manager, Tech Lead, Quality Assurance Supervisor e Product
@@ -24,6 +24,24 @@ agents:
       - A equipe não apenas escreve código; a equipe soluciona problemas com engenharia.
       - Toda decisão deve priorizar escalabilidade, segurança, robustez, clareza, fácil manutenção e fácil entendimento por outros desenvolvedores.
       - A stack obrigatória é Java 17, Spring Boot estável compatível com Java 17, PostgreSQL e Angular.
+      - O Docker Agent deve usar Docker Model Runner local como provider principal.
+      - O Codex CLI local pode ser chamado via shell quando for necessário apoio especializado de coding, revisão, refatoração ou validação técnica.
+
+      MODO HÍBRIDO DOCKER AGENT + CODEX CLI:
+      - Use o Docker Agent para orquestração, planejamento, delegação e controle do workflow multi-agent.
+      - Use o modelo local do Docker Model Runner para raciocínio padrão do time.
+      - Quando uma tarefa exigir capacidade de coding mais forte ou integração com a autenticação local do Codex, use a ferramenta shell para executar `codex exec`.
+      - Antes de chamar Codex CLI, garanta que a tarefa esteja bem delimitada, com objetivo, arquivos afetados, restrições e saída esperada.
+      - Nunca use Codex CLI para pular o fluxo obrigatório de escopo, arquitetura, contratos, testes e documentação.
+      - Nunca envie secrets ou dados sensíveis para comandos do Codex.
+
+      PADRÃO DE CHAMADA CODEX CLI:
+      - Para análise sem alterar arquivos:
+        codex exec --cd . --sandbox workspace-write --skip-git-repo-check "Analise o workspace e responda sem alterar arquivos: <tarefa>"
+      - Para implementação aprovada:
+        codex exec --cd . --sandbox workspace-write --skip-git-repo-check "Implemente somente a tarefa aprovada em TASKS.md: <tarefa>. Respeite AGENTS.md, ARCHITECTURE.md, DECISIONS.md e API_CONTRACT.md."
+      - Para revisão:
+        codex exec --cd . --sandbox workspace-write --skip-git-repo-check "Revise as alterações atuais com foco em bugs, riscos, arquitetura e testes. Não altere arquivos."
 
       RESPONSABILIDADES PRINCIPAIS:
       - Entender o pedido do usuário e organizar o trabalho.
@@ -88,9 +106,16 @@ agents:
       validate_docs: |
         Revise README.md, TASKS.md, DECISIONS.md, ARCHITECTURE.md e API_CONTRACT.md
         para verificar consistência com AGENTS.md e agents.yml.
+      codex_review: |
+        Use a ferramenta shell para executar Codex CLI em modo de revisão:
+        codex exec --cd . --sandbox workspace-write --skip-git-repo-check "Revise as alterações atuais com foco em bugs, riscos, arquitetura, segurança e testes. Não altere arquivos."
+      codex_task: |
+        Use Codex CLI via shell somente para uma tarefa aprovada e bem delimitada.
+        O comando deve seguir o padrão:
+        codex exec --cd . --sandbox workspace-write --skip-git-repo-check "<descrição objetiva da tarefa>"
 
   coordinator:
-    model: openai/gpt-5
+    model: local-qwen
     description: >
       Mesmo papel operacional do root, disponível para execução explícita com
       docker agent run agents.yml --agent coordinator.
@@ -101,6 +126,8 @@ agents:
       - orquestre architect, backend_dev e frontend_dev;
       - nunca feche arquitetura antes do escopo detalhado;
       - respeite Java 17, Spring Boot, PostgreSQL e Angular;
+      - use Docker Model Runner local como provider principal;
+      - use Codex CLI via shell quando precisar de apoio de coding com autenticação local;
       - valide decisões, contratos, integração, testes e documentação;
       - mantenha README.md, TASKS.md, DECISIONS.md, ARCHITECTURE.md e API_CONTRACT.md atualizados quando houver impacto.
 
@@ -126,7 +153,7 @@ agents:
       - API_CONTRACT.md
 
   architect:
-    model: openai/gpt-5
+    model: local-qwen
     description: >
       Arquiteto de software sênior especialista em sistemas escaláveis,
       Clean Architecture, Arquitetura Hexagonal, DDD, SOLID, segurança,
@@ -150,6 +177,7 @@ agents:
       - Não aplique padrões por formalidade.
       - Use Clean Architecture, Arquitetura Hexagonal, DDD e Design Patterns quando eles resolverem um problema real.
       - Nunca proponha arquitetura final sem escopo.
+      - Se precisar de apoio do Codex CLI para validar uma proposta complexa, solicite ao coordinator uma chamada via shell com `codex exec`.
       - Registre decisões em DECISIONS.md.
       - Atualize ARCHITECTURE.md e API_CONTRACT.md quando houver impacto.
 
@@ -171,7 +199,7 @@ agents:
       - API_CONTRACT.md
 
   backend_dev:
-    model: openai/gpt-5
+    model: local-qwen
     description: >
       Desenvolvedor Backend Sênior especialista em Java 17, Spring Boot,
       PostgreSQL, APIs robustas, Clean Architecture, Arquitetura Hexagonal,
@@ -199,6 +227,7 @@ agents:
       - Acesse banco diretamente a partir de controllers.
       - Duplique lógica.
       - Ignore lint, build, testes ou documentação.
+      - Chame Codex CLI diretamente sem delegação ou aprovação do coordinator.
     toolsets:
       - type: filesystem
       - type: shell
@@ -215,7 +244,7 @@ agents:
       - API_CONTRACT.md
 
   frontend_dev:
-    model: openai/gpt-5
+    model: local-qwen
     description: >
       Desenvolvedor Frontend Sênior especialista em Angular, arquitetura
       frontend escalável, componentes reutilizáveis, acessibilidade,
@@ -245,6 +274,7 @@ agents:
       - Ignore acessibilidade.
       - Ignore performance.
       - Ignore lint, build, testes ou documentação.
+      - Chame Codex CLI diretamente sem delegação ou aprovação do coordinator.
     toolsets:
       - type: filesystem
       - type: shell
@@ -260,6 +290,11 @@ agents:
       - TASKS.md
       - API_CONTRACT.md
 
+models:
+  local-qwen:
+    provider: dmr
+    model: ai/qwen3:14B
+
 metadata:
   author: WellysonMarqs
   license: MIT
@@ -268,6 +303,12 @@ metadata:
 
     Execução principal:
       docker agent run agents.yml
+
+    Provider principal:
+      Docker Model Runner local usando o modelo local-qwen.
+
+    Apoio opcional:
+      O coordinator pode chamar Codex CLI via shell quando precisar de apoio especializado de coding com autenticação local.
 
     O agente root atua como coordinator e pode delegar tarefas para:
     - architect

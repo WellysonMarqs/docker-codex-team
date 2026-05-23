@@ -234,10 +234,38 @@ Beneficios:
 
 Trade-offs:
 - depende do Docker Agent instalado no ambiente;
-- a execucao real depende de credenciais do provedor de modelo, como `OPENAI_API_KEY`;
+- a execucao real depende do provider configurado; no modo atual, depende do Docker Model Runner local;
 - o agente padrao precisa se chamar `root`, por isso o comportamento de coordinator fica nesse agente.
 
 Alternativas descartadas:
 - Runtime customizado com Dockerfile e Docker Compose: descartado porque o objetivo e usar o Docker Agent oficial.
 - Criar quatro imagens diferentes: descartado porque Docker Agent ja suporta time multi-agent em um unico YAML.
 - Implementar codigo de aplicacao junto com configuracao de agentes: descartado para manter separacao de responsabilidades.
+
+## ADR-010: Modo hibrido com Docker Model Runner e Codex CLI
+
+Status: Aceita.
+
+Decisao:
+Usar Docker Model Runner local como provider principal do Docker Agent e permitir que o coordinator chame o Codex CLI local via shell quando precisar de apoio especializado de coding, revisao, refatoracao ou validacao tecnica.
+
+Motivo:
+O objetivo e evitar dependencia obrigatoria de `OPENAI_API_KEY` no Docker Agent, mantendo o Docker Agent como orquestrador multi-agent e usando o Codex CLI local autenticado pelo usuario como ferramenta auxiliar quando necessario.
+
+Beneficios:
+- reduz dependencia de API key para o fluxo principal do Docker Agent;
+- mantem o Docker Agent oficial como runtime de orquestracao;
+- permite usar modelo local com Docker Model Runner;
+- permite aproveitar o Codex CLI local para tarefas de coding mais especificas;
+- preserva o controle do coordinator sobre delegacao, arquitetura, tarefas e documentacao.
+
+Trade-offs:
+- depende do Docker Model Runner estar habilitado e com modelo local baixado;
+- qualidade do raciocinio padrao depende do modelo local escolhido;
+- chamadas ao Codex CLI continuam dependendo da autenticacao local do Codex;
+- o Codex CLI deve ser usado como ferramenta auxiliar, nao como substituto do fluxo multi-agent.
+
+Alternativas descartadas:
+- Usar apenas `OPENAI_API_KEY`: descartado como caminho principal porque a preferencia atual e rodar com modelo local.
+- Usar apenas Codex CLI sem Docker Agent: descartado porque o objetivo e manter Docker Agent como orquestrador.
+- Criar provider customizado para Codex CLI: descartado por fragilidade e falta de suporte oficial.
