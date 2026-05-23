@@ -1,0 +1,67 @@
+services:
+  coordinator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: docker-codex-team-agent:local
+    container_name: docker-codex-team-coordinator
+    working_dir: /workspace
+    environment:
+      AGENT_NAME: coordinator
+      CODEX_HOME: /codex-home
+      CODEX_SANDBOX: workspace-write
+      CODEX_APPROVAL_POLICY: on-request
+    volumes:
+      - .:/workspace
+      - ${CODEX_HOME:-$HOME/.codex}:/codex-home
+    command: ["coordinator"]
+    stdin_open: true
+    tty: true
+
+  architect:
+    image: docker-codex-team-agent:local
+    profiles: ["agents"]
+    working_dir: /workspace
+    environment:
+      AGENT_NAME: architect
+      CODEX_HOME: /codex-home
+      CODEX_SANDBOX: workspace-write
+      CODEX_APPROVAL_POLICY: on-request
+    volumes:
+      - .:/workspace
+      - ${CODEX_HOME:-$HOME/.codex}:/codex-home
+    command: ["architect"]
+    stdin_open: true
+    tty: true
+
+  backend_dev:
+    image: docker-codex-team-agent:local
+    profiles: ["agents"]
+    working_dir: /workspace
+    environment:
+      AGENT_NAME: backend_dev
+      CODEX_HOME: /codex-home
+      CODEX_SANDBOX: workspace-write
+      CODEX_APPROVAL_POLICY: on-request
+    volumes:
+      - .:/workspace
+      - ${CODEX_HOME:-$HOME/.codex}:/codex-home
+    command: ["backend_dev"]
+    stdin_open: true
+    tty: true
+
+  frontend_dev:
+    image: docker-codex-team-agent:local
+    profiles: ["agents"]
+    working_dir: /workspace
+    environment:
+      AGENT_NAME: frontend_dev
+      CODEX_HOME: /codex-home
+      CODEX_SANDBOX: workspace-write
+      CODEX_APPROVAL_POLICY: on-request
+    volumes:
+      - .:/workspace
+      - ${CODEX_HOME:-$HOME/.codex}:/codex-home
+    command: ["frontend_dev"]
+    stdin_open: true
+    tty: true

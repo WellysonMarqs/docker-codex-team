@@ -1,0 +1,13 @@
+.git
+.idea
+.vscode
+node_modules
+target
+dist
+build
+.angular
+.gradle
+.mvn/wrapper/maven-wrapper.jar
+*.log
+tmp
+temp
