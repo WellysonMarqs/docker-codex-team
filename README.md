@@ -34,6 +34,10 @@ Executar o coordinator:
 docker compose run --rm coordinator "Analise o escopo do projeto e coordene os agentes conforme o workflow."
 ```
 
+```bash
+docker compose run --rm coordinator "$(cat prompts/customization-audit-scope.md)"
+```
+
 Validar sem consumir uma execucao real do Codex:
 
 ```bash
