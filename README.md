@@ -68,6 +68,12 @@ Executar com prompt inicial:
 docker agent run agents.yml "Analise o estado atual do projeto e conduza o workflow multi-agent."
 ```
 
+Executar com o escopo do sistema de auditoria de customizações:
+
+```bash
+docker agent run agents.yml "$(cat prompts/customization-audit-scope.md)"
+```
+
 Executar explicitamente o coordinator:
 
 ```bash
