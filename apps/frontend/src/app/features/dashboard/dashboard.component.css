@@ -1,0 +1,171 @@
+.layout {
+  min-height: 100vh;
+  padding: 32px;
+}
+
+.page-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin: 0 auto 24px;
+  max-width: 1680px;
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: #516070;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+h2 {
+  font-size: 1rem;
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(220px, 1fr)) minmax(0, 1.6fr);
+  gap: 20px;
+  margin: 0 auto;
+  max-width: 1680px;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #d8dee8;
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 0;
+}
+
+form {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+}
+
+label {
+  display: grid;
+  gap: 6px;
+  color: #344054;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+input,
+select {
+  width: 100%;
+  border: 1px solid #b8c1cc;
+  border-radius: 6px;
+  background: #ffffff;
+  padding: 10px 12px;
+}
+
+button {
+  border: 0;
+  border-radius: 6px;
+  background: #22577a;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 700;
+  padding: 11px 14px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.panel-header span,
+.empty,
+.error {
+  color: #516070;
+}
+
+.error {
+  color: #b42318;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border-bottom: 1px solid #e6eaf0;
+  padding: 12px 8px;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+tbody tr {
+  cursor: pointer;
+}
+
+tbody tr.selected {
+  background: #edf7f6;
+}
+
+th {
+  color: #516070;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+td {
+  vertical-align: top;
+}
+
+.section-title {
+  margin-top: 24px;
+}
+
+.hash {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 1280px) {
+  .workspace {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .customers {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 980px) {
+  .workspace {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .layout {
+    padding: 20px;
+  }
+
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+}

@@ -19,7 +19,7 @@ else
   AGENT_NAME="$DEFAULT_AGENT_NAME"
 fi
 
-MODEL="$("$PROMPT_SCRIPT" "$AGENT_NAME" --model-only)"
+MODEL="${CODEX_MODEL:-$("$PROMPT_SCRIPT" "$AGENT_NAME" --model-only)}"
 
 if [[ $# -gt 0 ]]; then
   TASK="$*"
@@ -39,7 +39,7 @@ if [[ "${DRY_RUN:-0}" == "1" ]]; then
   exit 0
 fi
 
-if [[ -n "$MODEL" ]]; then
+if [[ -n "$MODEL" && "$MODEL" != "default" ]]; then
   exec codex --ask-for-approval "$APPROVAL_POLICY" exec \
     --skip-git-repo-check \
     --cd "$WORKSPACE_DIR" \

@@ -28,7 +28,7 @@ orchestration:
 
 agents:
   coordinator:
-    model: openai/gpt-5
+    model: gpt-5.4
     description: >
       Coordenador técnico principal do projeto. Atua como Engineering Manager
       e Tech Lead de uma equipe sênior multi-agent. Responsável por organizar
@@ -142,7 +142,7 @@ agents:
 
 
   architect:
-    model: openai/gpt-5
+    model: gpt-5.4
     description: >
       Arquiteto de software sênior especialista em sistemas escaláveis,
       Clean Architecture, Arquitetura Hexagonal, SOLID, Design Patterns
@@ -230,7 +230,7 @@ agents:
 
 
   backend_dev:
-    model: openai/gpt-5
+    model: gpt-5.4
     description: >
       Desenvolvedor Backend Sênior especialista em APIs escaláveis,
       Clean Architecture, Arquitetura Hexagonal, testes automatizados,
@@ -314,7 +314,7 @@ agents:
 
 
   frontend_dev:
-    model: openai/gpt-5
+    model: gpt-5.4
     description: >
       Desenvolvedor Frontend Sênior especialista em aplicações modernas,
       componentização, arquitetura frontend escalável, performance,

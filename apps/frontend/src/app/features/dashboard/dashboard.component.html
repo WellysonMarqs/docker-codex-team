@@ -1,0 +1,309 @@
+<main class="layout">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">Controle de customizacoes</p>
+      <h1>Auditoria de integridade</h1>
+    </div>
+  </header>
+
+  <section class="workspace" aria-label="Cadastro e consulta de governanca de customizacoes">
+    <form class="panel" [formGroup]="customerForm" (ngSubmit)="createCustomer()">
+      <h2>Novo cliente</h2>
+      <label>
+        Nome
+        <input formControlName="name" autocomplete="organization" />
+      </label>
+      <label>
+        Referencia externa
+        <input formControlName="externalReference" />
+      </label>
+      <button type="submit" [disabled]="loading()">Cadastrar</button>
+    </form>
+
+    <form class="panel" [formGroup]="environmentForm" (ngSubmit)="createEnvironment()">
+      <h2>Novo ambiente</h2>
+      <label>
+        Cliente
+        <select [value]="selectedCustomerId() || ''" (change)="selectCustomer($any($event.target).value)">
+          <option value="" disabled>Selecione</option>
+          <option *ngFor="let customer of customers()" [value]="customer.id">{{ customer.name }}</option>
+        </select>
+      </label>
+      <label>
+        Nome
+        <input formControlName="name" />
+      </label>
+      <label>
+        Tipo
+        <select formControlName="type">
+          <option value="SAAS">SaaS</option>
+          <option value="ON_PREMISE">On-premise</option>
+        </select>
+      </label>
+      <label>
+        Coleta
+        <select formControlName="collectionMode">
+          <option value="CENTRAL_PULL">Central pull</option>
+          <option value="LOCAL_AGENT_PUSH">Local agent push</option>
+          <option value="MANUAL_SIGNATURE_UPLOAD">Upload manual</option>
+        </select>
+      </label>
+      <label>
+        Referencia de credencial
+        <input formControlName="credentialReferenceId" />
+      </label>
+      <button type="submit" [disabled]="loading()">Cadastrar</button>
+    </form>
+
+    <form class="panel" [formGroup]="customizationForm" (ngSubmit)="createCustomization()">
+      <h2>Nova customizacao</h2>
+      <label>
+        Nome
+        <input formControlName="name" />
+      </label>
+      <label>
+        Tipo de objeto
+        <select formControlName="objectType">
+          <option value="TABLE">Tabela</option>
+          <option value="FUNCTION">Funcao</option>
+          <option value="PROCEDURE">Procedure</option>
+          <option value="TRIGGER">Trigger</option>
+          <option value="SQL_SCRIPT">Script SQL</option>
+          <option value="OTHER">Outro</option>
+        </select>
+      </label>
+      <label>
+        Identificador
+        <input formControlName="objectIdentifier" />
+      </label>
+      <label>
+        Descricao
+        <input formControlName="description" />
+      </label>
+      <label>
+        Responsavel
+        <input formControlName="createdBy" />
+      </label>
+      <button type="submit" [disabled]="loading()">Cadastrar</button>
+    </form>
+
+    <form class="panel" [formGroup]="versionForm" (ngSubmit)="createCustomizationVersion()">
+      <h2>Versao oficial</h2>
+      <label>
+        Versao legado
+        <input formControlName="legacySystemVersion" />
+      </label>
+      <label>
+        Hash oficial
+        <input formControlName="officialHash" />
+      </label>
+      <label>
+        Algoritmo
+        <input formControlName="hashAlgorithm" />
+      </label>
+      <label>
+        Canonicalizacao
+        <input formControlName="canonicalizationVersion" />
+      </label>
+      <label>
+        Assinatura
+        <input formControlName="contentSignature" />
+      </label>
+      <label>
+        Registrado por
+        <input formControlName="registeredBy" />
+      </label>
+      <button type="submit" [disabled]="loading()">Registrar</button>
+    </form>
+
+    <form class="panel" [formGroup]="verificationForm" (ngSubmit)="createVerificationRun()">
+      <h2>Verificacao manual</h2>
+      <label>
+        Cliente
+        <select [value]="selectedCustomerId() || ''" (change)="selectCustomer($any($event.target).value)">
+          <option value="" disabled>Selecione</option>
+          <option *ngFor="let customer of customers(); trackBy: trackById" [value]="customer.id">{{ customer.name }}</option>
+        </select>
+      </label>
+      <label>
+        Ambiente
+        <select [value]="selectedEnvironmentId() || ''" (change)="selectEnvironment($any($event.target).value)">
+          <option value="" disabled>Selecione</option>
+          <option
+            *ngFor="let environment of environments(); trackBy: trackById"
+            [value]="environment.id"
+          >
+            {{ environment.name }}
+          </option>
+        </select>
+      </label>
+      <label>
+        Versao oficial
+        <select
+          [value]="selectedCustomizationVersionId() || ''"
+          (change)="selectCustomizationVersion($any($event.target).value)"
+        >
+          <option value="" disabled>Selecione</option>
+          <option
+            *ngFor="let version of customizationVersions(); trackBy: trackById"
+            [value]="version.id"
+          >
+            {{ version.legacySystemVersion }} · {{ version.canonicalizationVersion }}
+          </option>
+        </select>
+      </label>
+      <label>
+        Hash atual informado
+        <input formControlName="currentHash" />
+      </label>
+      <label>
+        Solicitado por
+        <input formControlName="requestedBy" />
+      </label>
+      <label>
+        Correlation ID
+        <input formControlName="correlationId" />
+      </label>
+      <button type="submit" [disabled]="loading()">Verificar</button>
+    </form>
+
+    <section class="panel customers" aria-label="Clientes e ambientes cadastrados">
+      <div class="panel-header">
+        <h2>Clientes</h2>
+        <span *ngIf="loading()">Atualizando</span>
+      </div>
+
+      <p class="error" *ngIf="errorMessage()">{{ errorMessage() }}</p>
+      <p class="empty" *ngIf="customers().length === 0 && !loading()">Nenhum cliente cadastrado.</p>
+
+      <table *ngIf="customers().length > 0">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Referencia</th>
+            <th>Status</th>
+            <th>Criado em</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let customer of customers(); trackBy: trackById"
+            [class.selected]="customer.id === selectedCustomerId()"
+            (click)="selectCustomer(customer.id)"
+          >
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.externalReference || '-' }}</td>
+            <td>{{ customer.status }}</td>
+            <td>{{ customer.createdAt | date: 'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="section-title">Ambientes</h2>
+      <p class="empty" *ngIf="environments().length === 0 && !loading()">Nenhum ambiente cadastrado.</p>
+
+      <table *ngIf="environments().length > 0">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Coleta</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let environment of environments(); trackBy: trackById"
+            [class.selected]="environment.id === selectedEnvironmentId()"
+            (click)="selectEnvironment(environment.id)"
+          >
+            <td>{{ environment.name }}</td>
+            <td>{{ environment.type }}</td>
+            <td>{{ environment.collectionMode }}</td>
+            <td>{{ environment.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="section-title">Customizacoes</h2>
+      <p class="empty" *ngIf="customizations().length === 0 && !loading()">Nenhuma customizacao cadastrada.</p>
+
+      <table *ngIf="customizations().length > 0">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Tipo</th>
+            <th>Objeto</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let customization of customizations(); trackBy: trackById"
+            [class.selected]="customization.id === selectedCustomizationId()"
+            (click)="selectCustomization(customization.id)"
+          >
+            <td>{{ customization.name }}</td>
+            <td>{{ customization.objectType }}</td>
+            <td>{{ customization.objectIdentifier }}</td>
+            <td>{{ customization.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="section-title">Versoes oficiais</h2>
+      <p class="empty" *ngIf="customizationVersions().length === 0 && !loading()">Nenhuma versao registrada.</p>
+
+      <table *ngIf="customizationVersions().length > 0">
+        <thead>
+          <tr>
+            <th>Legado</th>
+            <th>Hash</th>
+            <th>Canon</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let version of customizationVersions(); trackBy: trackById"
+            [class.selected]="version.id === selectedCustomizationVersionId()"
+            (click)="selectCustomizationVersion(version.id)"
+          >
+            <td>{{ version.legacySystemVersion }}</td>
+            <td class="hash">{{ version.officialHash }}</td>
+            <td>{{ version.canonicalizationVersion }}</td>
+            <td>{{ version.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2 class="section-title">Historico de verificacoes</h2>
+      <p class="empty" *ngIf="verificationRuns().length === 0 && !loading()">Nenhuma verificacao registrada.</p>
+
+      <table *ngIf="verificationRuns().length > 0">
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Ambiente</th>
+            <th>Versao</th>
+            <th>Resultado</th>
+            <th>Status</th>
+            <th>Solicitado por</th>
+            <th>Executada em</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let verificationRun of verificationRuns(); trackBy: trackById">
+            <td>{{ customerName(verificationRun.customerId) }}</td>
+            <td>{{ environmentName(verificationRun.environmentId) }}</td>
+            <td>{{ customizationVersionLabel(verificationRun.result.customizationVersionId) }}</td>
+            <td>{{ verificationRun.result.status }}</td>
+            <td>{{ verificationRun.status }}</td>
+            <td>{{ verificationRun.requestedBy || '-' }}</td>
+            <td>{{ verificationRun.startedAt | date: 'short' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+  </section>
+</main>

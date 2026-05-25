@@ -32,6 +32,8 @@ def load_agents(path: Path) -> dict[str, Any]:
 
 def agent_model(agent: dict[str, Any]) -> str:
     model = str(agent.get("model", "")).strip()
+    if model == "default":
+        return ""
     return model.removeprefix("openai/")
 
 
@@ -59,6 +61,8 @@ def render_prompt(agent_name: str, task: str | None) -> str:
 REGRAS DE EXECUCAO DO DOCKER AGENT:
 - O coordinator e o ponto de entrada principal.
 - architect, backend_dev e frontend_dev devem atuar como agentes especializados.
+- Nao use ferramentas internas de colaboracao como SpawnAgent ou Wait para acionar subagentes.
+- Quando precisar de um subagente, registre a delegacao documentalmente; a execucao especializada ocorre por servicos Docker dedicados.
 - Nao implemente codigo de aplicacao sem escopo detalhado, arquitetura aprovada e tarefa registrada.
 - A stack obrigatoria e Java 17, Spring Boot estavel compativel, PostgreSQL e Angular.
 - A arquitetura final deve ser proposta somente apos o problema estar detalhado.

@@ -1,15 +1,60 @@
 services:
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["app"]
+    environment:
+      POSTGRES_DB: customization_audit
+      POSTGRES_USER: customization_audit
+      POSTGRES_PASSWORD: customization_audit
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U customization_audit -d customization_audit"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./apps/backend
+      dockerfile: Dockerfile
+    profiles: ["app"]
+    environment:
+      SPRING_PROFILES_ACTIVE: local
+      DATABASE_URL: jdbc:postgresql://postgres:5432/customization_audit
+      DATABASE_USERNAME: customization_audit
+      DATABASE_PASSWORD: customization_audit
+      OAUTH2_ISSUER_URI: http://localhost:8081/realms/customization-audit
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./apps/frontend
+      dockerfile: Dockerfile
+    profiles: ["app"]
+    ports:
+      - "4200:4200"
+    depends_on:
+      - backend
+
   coordinator:
     build:
       context: .
       dockerfile: Dockerfile
     image: docker-codex-team-agent:local
     container_name: docker-codex-team-coordinator
+    profiles: ["agents"]
     working_dir: /workspace
     environment:
       AGENT_NAME: coordinator
       CODEX_HOME: /codex-home
-      CODEX_SANDBOX: workspace-write
+      CODEX_SANDBOX: danger-full-access
       CODEX_APPROVAL_POLICY: on-request
     volumes:
       - .:/workspace
@@ -25,7 +70,7 @@ services:
     environment:
       AGENT_NAME: architect
       CODEX_HOME: /codex-home
-      CODEX_SANDBOX: workspace-write
+      CODEX_SANDBOX: danger-full-access
       CODEX_APPROVAL_POLICY: on-request
     volumes:
       - .:/workspace
@@ -41,7 +86,7 @@ services:
     environment:
       AGENT_NAME: backend_dev
       CODEX_HOME: /codex-home
-      CODEX_SANDBOX: workspace-write
+      CODEX_SANDBOX: danger-full-access
       CODEX_APPROVAL_POLICY: on-request
     volumes:
       - .:/workspace
@@ -57,7 +102,7 @@ services:
     environment:
       AGENT_NAME: frontend_dev
       CODEX_HOME: /codex-home
-      CODEX_SANDBOX: workspace-write
+      CODEX_SANDBOX: danger-full-access
       CODEX_APPROVAL_POLICY: on-request
     volumes:
       - .:/workspace
@@ -65,3 +110,6 @@ services:
     command: ["frontend_dev"]
     stdin_open: true
     tty: true
+
+volumes:
+  postgres-data:
