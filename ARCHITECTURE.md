@@ -2,7 +2,7 @@
 
 ## 1. Contexto
 
-Este workspace inicia um produto ainda sem codigo de aplicacao. A configuracao atual define uma equipe multi-agent com os papeis `coordinator`, `architect`, `backend_dev` e `frontend_dev`, orientada por Clean Code, SOLID, Clean Architecture, Arquitetura Hexagonal, DDD, testes automatizados, seguranca, performance, escalabilidade e observabilidade.
+Este workspace inicia um produto ainda sem codigo de aplicacao. A configuracao atual define uma equipe multi-agent com os papeis `root`, `architect`, `backend_dev`, `frontend_dev` e `qa`, orientada por Clean Code, SOLID, Clean Architecture, Arquitetura Hexagonal, DDD, testes automatizados, seguranca, performance, escalabilidade e observabilidade.
 
 A arquitetura final nao deve ser fechada antes do envio do escopo detalhado do produto. O papel da equipe nao e apenas escrever codigo: e entender o problema, propor a melhor solucao possivel e construir um sistema robusto, seguro, escalavel, compreensivel por outros desenvolvedores e facil de manter.
 
@@ -82,10 +82,11 @@ Versao sugerida no planejamento atual:
 
 ### 4.1 Papeis
 
-- `coordinator`: coordena o fluxo, valida qualidade, integra entregas, bloqueia decisoes frageis e garante documentacao.
+- `root`: coordena o fluxo, valida qualidade, integra entregas, bloqueia decisoes frageis e garante documentacao.
 - `architect`: analisa o problema, modela dominio, avalia trade-offs e propoe arquitetura apos receber o escopo.
 - `backend_dev`: implementa backend somente apos aprovacao da arquitetura e dos contratos.
 - `frontend_dev`: implementa frontend somente apos aprovacao da estrategia de UX, arquitetura frontend e contratos.
+- `qa`: define estrategia, executa validacoes e aprova os testes obrigatorios do projeto.
 
 ### 4.2 Docker Agent Oficial
 
@@ -95,9 +96,7 @@ Formato operacional:
 
 - `agents.yml` e o arquivo de configuracao do time multi-agent.
 - `root` e o agente de entrada padrao exigido para `docker agent run agents.yml`.
-- O comportamento do `root` e o de `coordinator`.
-- `coordinator` tambem existe como agente explicito para execucao com `--agent coordinator`.
-- `architect`, `backend_dev` e `frontend_dev` sao sub-agentes especializados.
+- `architect`, `backend_dev`, `frontend_dev` e `qa` sao sub-agentes especializados.
 - Os documentos obrigatorios sao adicionados ao contexto via `add_prompt_files`.
 - Os agentes usam toolsets oficiais como `filesystem`, `shell`, `think` e `todo`.
 
@@ -105,24 +104,22 @@ Regra operacional:
 
 - O comando principal e `docker agent run agents.yml`.
 - O `root` atua como coordinator e delega tarefas por `sub_agents`.
-- `architect`, `backend_dev` e `frontend_dev` devem atuar dentro dos limites definidos em `agents.yml`.
+- `architect`, `backend_dev`, `frontend_dev` e `qa` devem atuar dentro dos limites definidos em `agents.yml`.
 - O Docker Agent gerencia a coordenacao e as delegacoes.
-- O provider principal do Docker Agent e Docker Model Runner local.
-- O modelo local configurado e `local-qwen`, apontando para `ai/qwen3:4B-UD-Q4_K_XL`.
-- O Codex CLI local pode ser chamado via shell pelo coordinator quando uma tarefa exigir apoio especializado de coding, revisao, refatoracao ou validacao tecnica.
-- O Codex CLI nao substitui o workflow multi-agent; ele e uma ferramenta auxiliar chamada sob demanda.
+- O provider principal do Docker Agent e OpenAI, autenticado por `OPENAI_API_KEY`.
+- O modelo configurado em `agents.yml` e `openai-main`, apontando para `gpt-5.4`.
 - Nenhuma implementacao deve iniciar sem escopo, arquitetura aprovada e tarefa rastreavel.
 
-Fluxo hibrido:
+Fluxo operacional:
 
 ```text
 Docker Agent
-  -> Docker Model Runner local
-  -> root/coordinator
+  -> OpenAI API
+  -> root
       -> architect
       -> backend_dev
       -> frontend_dev
-      -> shell: codex exec ... quando necessario
+      -> qa
 ```
 
 ### 4.3 Fluxo obrigatorio
@@ -135,7 +132,8 @@ Docker Agent
 6. `architect` atualiza `ARCHITECTURE.md` com a arquitetura aprovada.
 7. Contratos sao definidos em `API_CONTRACT.md` quando houver integracao.
 8. `backend_dev` e `frontend_dev` implementam apenas tarefas aprovadas em `TASKS.md`.
-9. `coordinator` valida integracao, lint, build, testes e documentacao.
+9. `qa` executa a estrategia de testes, valida quality gates e reporta falhas ou lacunas.
+10. `coordinator` valida integracao, lint, build, testes e documentacao.
 
 ## 5. Criterios Para Definir a Arquitetura
 

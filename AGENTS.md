@@ -20,7 +20,7 @@ Todos os agentes devem atuar como engenheiros seniores.
 
 ## Referência oficial de patterns
 
-https://refactoring.guru/design-patterns
+https://refactoring.guru/pt-br/design-patterns
 
 ## Regras Globais
 

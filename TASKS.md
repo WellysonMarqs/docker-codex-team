@@ -41,11 +41,9 @@ Status: Concluida.
 - [x] Validar `docker agent debug config agents.yml`.
 - [x] Validar toolsets com `docker agent debug toolsets agents.yml`.
 - [ ] Validar build de imagem quando a CLI local expuser `docker agent build`.
-- [x] Configurar Docker Model Runner local como provider principal.
-- [x] Configurar Codex CLI como ferramenta auxiliar via shell.
-- [ ] Validar Docker Model Runner habilitado localmente.
-- [ ] Validar modelo `ai/qwen3:4B-UD-Q4_K_XL` disponivel localmente.
-- [ ] Validar `docker agent run agents.yml --dry-run` apos habilitar Docker Model Runner.
+- [x] Configurar OpenAI como provider principal via `OPENAI_API_KEY`.
+- [ ] Validar `OPENAI_API_KEY` disponivel no ambiente local.
+- [ ] Validar `docker agent run agents.yml --dry-run` com provider OpenAI.
 - [x] Atualizar `ARCHITECTURE.md`.
 - [x] Atualizar `DECISIONS.md`.
 - [x] Atualizar `TASKS.md`.
@@ -132,7 +130,7 @@ Gate de saida:
 
 ### Etapa 4: Setup do projeto
 
-Responsaveis: `backend_dev`, `frontend_dev`, validacao do `coordinator`.
+Responsaveis: `backend_dev`, `frontend_dev`, `qa`, validacao do `coordinator`.
 
 Status: Bloqueada por Etapa 3.
 
@@ -214,9 +212,34 @@ Gate de saida:
 - [ ] Fluxos criticos E2E passam.
 - [ ] Validacao de acessibilidade realizada.
 
+### Etapa 6A: QA e Validacao
+
+Responsavel principal: `qa`.
+
+Status: Bloqueada por Etapas 4, 5 e 6.
+
+- [ ] Definir estrategia de testes por fluxo critico.
+- [ ] Validar cobertura minima de backend.
+- [ ] Validar cobertura minima de frontend.
+- [ ] Executar lint.
+- [ ] Executar build.
+- [ ] Executar testes unitarios.
+- [ ] Executar testes de integracao.
+- [ ] Executar testes de contrato quando aplicavel.
+- [ ] Executar E2E nos fluxos criticos quando aplicavel.
+- [ ] Executar validacao automatizada de acessibilidade quando aplicavel.
+- [ ] Registrar bugs, riscos e lacunas de cobertura.
+- [ ] Aprovar ou reprovar quality gates.
+
+Gate de saida:
+
+- [ ] Evidencias de validacao registradas.
+- [ ] Falhas criticas tratadas ou bloqueios formalizados.
+- [ ] Quality gates aprovados para integracao.
+
 ### Etapa 7: CI/CD
 
-Responsavel principal: `coordinator`.
+Responsaveis principais: `coordinator` e `qa`.
 
 Status: Bloqueada por Etapa 4.
 
@@ -242,7 +265,7 @@ Gate de saida:
 
 ### Etapa 8: Hardening
 
-Responsaveis: todos os agentes.
+Responsaveis: todos os agentes, com lideranca de `qa` na frente de testes.
 
 Status: Bloqueada por Etapas 5, 6 e 7.
 
@@ -278,9 +301,20 @@ Criterios de aceite:
 - [ ] Angular estavel confirmado.
 - [ ] Arquitetura final mantida como pendente ate o escopo.
 - [x] Docker Agent oficial validado localmente para configuracao e toolsets.
-- [ ] Docker Model Runner habilitado.
-- [ ] Modelo local `ai/qwen3:4B-UD-Q4_K_XL` disponivel.
-- [x] Codex CLI instalado localmente.
+- [ ] `OPENAI_API_KEY` configurada no ambiente local.
+
+### TASK-001C: Configurar sub-agent de QA
+
+Responsavel: `coordinator`.
+
+Status: Pendente.
+
+Criterios de aceite:
+
+- [x] Agente `qa` definido em `agents.yml`.
+- [x] `root` pode delegar tarefas para `qa`.
+- [ ] `docker agent debug toolsets agents.yml` confirma toolsets do `qa`.
+- [x] Workflow e documentacao atualizados para incluir `qa`.
 
 ### TASK-001A: Validar Docker Agent oficial
 
@@ -291,19 +325,17 @@ Status: Pendente.
 Criterios de aceite:
 
 - [x] `docker agent debug config agents.yml` executa com sucesso.
-- [ ] `docker agent run agents.yml --dry-run` executa com sucesso apos Docker Model Runner estar rodando.
+- [ ] `docker agent run agents.yml --dry-run` executa com sucesso com `OPENAI_API_KEY` configurada.
 - [ ] `docker agent run agents.yml` inicia o root/coordinator.
-- [ ] `docker agent run agents.yml --agent coordinator --dry-run` inicia o coordinator explicito em dry-run apos Docker Model Runner estar rodando.
 - [x] `docker agent debug toolsets agents.yml` lista ferramentas dos agentes.
-- [ ] `docker agent build agents.yml docker-codex-team-agent:latest` gera a imagem do agente quando disponivel na CLI local.
+- [ ] `docker agent build agents.yml team-agents:latest` gera a imagem do agente quando disponivel na CLI local.
 - [x] Todos os agentes usam `agents.yml` como fonte de instrucao.
-- [x] `agents.yml` usa Docker Model Runner local como provider principal.
-- [x] `agents.yml` orienta o coordinator a chamar Codex CLI via shell quando necessario.
+- [x] `agents.yml` usa OpenAI como provider principal.
 
 Observacao:
-A CLI local validada e `docker agent v1.57.0`. Ela suporta `run`, `debug config` e `debug toolsets`, mas nao expoe `build` nesta instalacao, apesar de a documentacao oficial atual listar esse comando. O `run --dry-run` com `local-qwen` tenta acessar o Docker Model Runner; neste ambiente ele falha enquanto o Model Runner nao estiver habilitado.
+A CLI local validada e `docker agent v1.57.0`. Ela suporta `run`, `debug config` e `debug toolsets`, mas nao expoe `build` nesta instalacao, apesar de a documentacao oficial atual listar esse comando. O `run --dry-run` agora depende de `OPENAI_API_KEY` valido no ambiente.
 
-### TASK-001B: Habilitar Docker Model Runner local
+### TASK-001B: Configurar provider OpenAI no ambiente local
 
 Responsavel: usuario e `coordinator`.
 
@@ -311,12 +343,9 @@ Status: Pendente.
 
 Criterios de aceite:
 
-- [ ] `docker desktop enable model-runner` executado no ambiente do usuario.
-- [ ] `docker model version` mostra server acessivel.
-- [ ] `docker model pull ai/qwen3:4B-UD-Q4_K_XL` executa com sucesso.
-- [ ] `docker model list` mostra `ai/qwen3:4B-UD-Q4_K_XL`.
-- [ ] `docker agent run agents.yml --dry-run` executa sem `OPENAI_API_KEY`.
-- [ ] `docker agent run agents.yml` inicia usando Docker Model Runner local.
+- [ ] `OPENAI_API_KEY` configurada no shell ou no ambiente do usuario.
+- [ ] `docker agent run agents.yml --dry-run` executa com sucesso.
+- [ ] `docker agent run agents.yml` inicia usando OpenAI como provider principal.
 
 ### TASK-002: Receber e documentar escopo detalhado
 
@@ -373,6 +402,19 @@ Criterios de aceite:
 - [ ] PostgreSQL local configurado.
 - [ ] Comandos de build, lint e testes disponiveis.
 - [ ] Documentacao atualizada.
+
+### TASK-006: Estruturar estrategia de QA
+
+Responsavel: `qa`.
+
+Status: Bloqueada por TASK-005.
+
+Criterios de aceite:
+
+- [ ] Matriz de testes definida por fluxo critico.
+- [ ] Quality gates definidos por tipo de entrega.
+- [ ] Estrategia de evidencias de execucao definida.
+- [ ] Responsabilidades entre implementacao e validacao documentadas.
 
 ## Modelo de Tarefa
 

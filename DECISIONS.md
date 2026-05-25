@@ -214,12 +214,12 @@ Alternativas descartadas:
 - Escolher padroes por preferencia pessoal: descartado.
 - Implementar rapidamente sem analise: descartado.
 
-## ADR-009: Docker Agent oficial com coordinator como orquestrador
+## ADR-009: Docker Agent oficial com root como orquestrador
 
 Status: Aceita.
 
 Decisao:
-Usar o Docker Agent oficial com `agents.yml` como configuracao do time multi-agent. O agente `root` atua como coordinator para permitir o comando padrao `docker agent run agents.yml`, e o agente `coordinator` tambem fica disponivel para execucao explicita.
+Usar o Docker Agent oficial com `agents.yml` como configuracao do time multi-agent. O agente `root` atua como orquestrador principal e delega tarefas para os agentes especializados.
 
 Motivo:
 O Docker Agent e o framework oficial da Docker para definir e executar times de agentes especializados por YAML, com delegacao via `sub_agents`.
@@ -228,44 +228,65 @@ Beneficios:
 - segue a documentacao oficial da Docker;
 - usa `docker agent run agents.yml` como comando principal;
 - preserva `agents.yml` como fonte primaria;
-- permite delegacao hierarquica para architect, backend_dev e frontend_dev;
+- permite delegacao hierarquica para architect, backend_dev, frontend_dev e qa;
 - evita runtime customizado desnecessario;
 - permite gerar imagem com `docker agent build agents.yml`.
 
 Trade-offs:
 - depende do Docker Agent instalado no ambiente;
-- a execucao real depende do provider configurado; no modo atual, depende do Docker Model Runner local;
-- o agente padrao precisa se chamar `root`, por isso o comportamento de coordinator fica nesse agente.
+- a execucao real depende do provider configurado; no modo atual, depende de `OPENAI_API_KEY` valido no ambiente;
+- o agente padrao precisa se chamar `root`, concentrando a coordenacao nesse agente.
 
 Alternativas descartadas:
 - Runtime customizado com Dockerfile e Docker Compose: descartado porque o objetivo e usar o Docker Agent oficial.
 - Criar quatro imagens diferentes: descartado porque Docker Agent ja suporta time multi-agent em um unico YAML.
 - Implementar codigo de aplicacao junto com configuracao de agentes: descartado para manter separacao de responsabilidades.
 
-## ADR-010: Modo hibrido com Docker Model Runner e Codex CLI
+## ADR-011: Agente dedicado de QA para quality gates e validacao de testes
 
 Status: Aceita.
 
 Decisao:
-Usar Docker Model Runner local como provider principal do Docker Agent e permitir que o coordinator chame o Codex CLI local via shell quando precisar de apoio especializado de coding, revisao, refatoracao ou validacao tecnica.
+Adicionar um sub-agent `qa` dedicado a estrategia, execucao e validacao dos testes obrigatorios do projeto.
 
 Motivo:
-O objetivo e evitar dependencia obrigatoria de `OPENAI_API_KEY` no Docker Agent, mantendo o Docker Agent como orquestrador multi-agent e usando o Codex CLI local autenticado pelo usuario como ferramenta auxiliar quando necessario.
+Os testes descritos na documentacao nao devem ficar diluidos apenas entre implementacao backend e frontend. Um agente especializado em QA melhora a independencia da validacao, aumenta a rastreabilidade dos quality gates e reduz o risco de entregas com cobertura insuficiente.
 
 Beneficios:
-- reduz dependencia de API key para o fluxo principal do Docker Agent;
+- explicita ownership de validacao;
+- melhora a disciplina de quality gates;
+- separa implementacao de verificacao;
+- favorece cobertura de testes unitarios, integracao, contrato, E2E e acessibilidade;
+- aumenta a clareza do workflow multi-agent.
+
+Trade-offs:
+- adiciona mais um agente para coordenar;
+- exige delimitacao clara entre implementar testes e validar testes;
+- pode aumentar o tempo total de execucao em fluxos completos.
+
+Alternativas descartadas:
+- Deixar todos os testes somente com backend_dev e frontend_dev: descartado por reduzir independencia na validacao.
+- Concentrar toda validacao apenas no root: descartado por misturar orquestracao com execucao especializada de QA.
+
+## ADR-010: OpenAI como provider principal do Docker Agent
+
+Status: Aceita.
+
+Decisao:
+Usar OpenAI como provider principal do Docker Agent por meio da variavel de ambiente `OPENAI_API_KEY`.
+
+Motivo:
+O objetivo e usar um provider cloud suportado oficialmente e de configuracao simples no Docker Agent, mantendo o Docker Agent como orquestrador multi-agent.
+
+Beneficios:
 - mantem o Docker Agent oficial como runtime de orquestracao;
-- permite usar modelo local com Docker Model Runner;
-- permite aproveitar o Codex CLI local para tarefas de coding mais especificas;
+- usa um modelo OpenAI suportado nativamente pelo Docker Agent;
+- simplifica a inicializacao em ambientes onde o Docker Model Runner nao esta habilitado;
 - preserva o controle do coordinator sobre delegacao, arquitetura, tarefas e documentacao.
 
 Trade-offs:
-- depende do Docker Model Runner estar habilitado e com modelo local baixado;
-- qualidade do raciocinio padrao depende do modelo local escolhido;
-- chamadas ao Codex CLI continuam dependendo da autenticacao local do Codex;
-- o Codex CLI deve ser usado como ferramenta auxiliar, nao como substituto do fluxo multi-agent.
+- depende de `OPENAI_API_KEY` valido no ambiente de execucao;
+- pode gerar custo de consumo de API conforme uso.
 
 Alternativas descartadas:
-- Usar apenas `OPENAI_API_KEY`: descartado como caminho principal porque a preferencia atual e rodar com modelo local.
-- Usar apenas Codex CLI sem Docker Agent: descartado porque o objetivo e manter Docker Agent como orquestrador.
-- Criar provider customizado para Codex CLI: descartado por fragilidade e falta de suporte oficial.
+- Usar Docker Model Runner local como caminho principal: descartado para esta configuracao porque a prioridade atual e simplificar a execucao com provider cloud suportado oficialmente.
