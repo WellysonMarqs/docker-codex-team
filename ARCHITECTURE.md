@@ -411,7 +411,9 @@ Estado atual do scaffold:
 - os modos `CENTRAL_PULL`, `LOCAL_AGENT_PUSH` e `MANUAL_SIGNATURE_UPLOAD` ja sao persistidos no cadastro de ambiente, mas ainda nao acionam coletores automaticos distintos;
 - ainda nao existe coletor MySQL no backend;
 - ainda nao existe canonicalizacao automatica de objetos SQL;
-- ainda nao existe abertura automatica de `Divergence`, notificacao ao legado ou agente on-premise nesta vertical.
+- a abertura automatica de `Divergence` para resultado manual `DIVERGENT` ja existe;
+- ainda nao existe notificacao automatica ao legado;
+- ainda nao existe agente on-premise executando `LOCAL_AGENT_PUSH`.
 
 ### 14.9 Notificacao ao legado
 
@@ -548,6 +550,7 @@ Backend implementado:
 - Perfil `local` permissivo para desenvolvimento Docker; perfil padrao mantem Resource Server JWT e RBAC por escopos.
 - Lombok usado para reduzir boilerplate em objetos de dominio e entidades JPA sem remover invariantes do dominio.
 - Springdoc OpenAPI exposto em `/v3/api-docs` e Swagger UI em `/swagger-ui.html`.
+- `GlobalExceptionHandler` com timestamp via `Clock` injetado e `TestSecurityConfig` cobrindo o mesmo contrato nos web slice tests para manter o pipeline local consistente.
 
 Frontend implementado:
 
@@ -563,6 +566,9 @@ Frontend implementado:
 - Tabela de listagem de versoes oficiais da customizacao selecionada.
 - Formulario de verificacao manual auditavel a partir da versao oficial selecionada.
 - Tabela de historico de verificacoes com resultado embutido.
+- Tabela de divergencias persistidas por cliente e ambiente.
+- Acoes de reconhecimento e resolucao de divergencias diretamente na etapa Angular de divergencias.
+- Tabela de `legacy-notifications` persistidas por cliente e ambiente.
 - Estados basicos de loading, erro e vazio.
 
 Backend adicional implementado:
@@ -570,22 +576,40 @@ Backend adicional implementado:
 - Dominio `VerificationRun`, `VerificationResult`, `VerificationRunStatus`, `VerificationResultStatus` e `VerificationTriggerType`.
 - Caso de uso `CreateVerificationRunService`.
 - Query `ListVerificationRunsQuery`.
+- Query `ListVerificationRunsQuery` com filtros opcionais por cliente e ambiente.
 - Portas `VerificationRunRepository` e `VerificationResultRepository`.
 - Adapters JPA/PostgreSQL `PostgresVerificationRunRepository` e `PostgresVerificationResultRepository`.
 - Controller REST `VerificationRunController`.
+- Controller REST `DivergenceController`.
+- Controller REST `LegacyNotificationController`.
+- Caso de uso `UpdateDivergenceStatusService`.
+- Query `ListLegacyNotificationsQuery`.
 - Migracao Flyway `V5__create_verification_runs.sql`.
 - Migracao Flyway `V6__create_verification_results.sql`.
+- Migracao Flyway `V7__create_divergences.sql`.
+- Migracao Flyway `V8__create_legacy_notifications.sql`.
 - Testes unitarios do caso de uso de verificacao manual.
 - Testes unitarios da query `ListVerificationRunsQuery`.
 - Testes web slice do `VerificationRunController`.
+- Testes unitarios e web slice da vertical de divergencias persistidas.
+- Testes unitarios e web slice da transicao de status de divergencias.
+- Testes unitarios e web slice da vertical de `legacy-notifications`.
+- Validacao HTTP real da vertical concluida contra a stack Docker para criacao, listagem e detalhe de `verification-runs`.
+- Validacao HTTP real da vertical concluida contra a stack Docker para criacao automatica, listagem filtrada e detalhe de `divergences`.
+- Validacao HTTP real da vertical concluida contra a stack Docker para `ACKNOWLEDGED` e `RESOLVED` em `divergences`.
+- Validacao HTTP real da vertical concluida contra a stack Docker para criacao automatica, listagem filtrada e detalhe de `legacy-notifications`.
 
 Escopo funcional desta vertical:
 
 - verificacao manual auditavel por comparacao entre `currentHash` informado e `officialHash` registrado;
 - persistencia de `VerificationRun` e `VerificationResult`;
+- abertura automatica de `Divergence` quando o resultado for `DIVERGENT`;
+- abertura automatica de `LegacyNotification` com `status=PENDING` quando a divergencia for criada;
+- transicao manual de `Divergence` para `ACKNOWLEDGED` e `RESOLVED` por endpoint REST;
 - um `VerificationResult` por `VerificationRun` nesta fase manual;
 - historico consultavel por API REST;
-- sem coletor MySQL, sem canonicalizacao automatica e sem abertura automatica de `Divergence` nesta fase.
+- historico consultavel por API REST com filtros minimos por cliente e ambiente;
+- outbox persistido para notificacao ao legado, ainda sem dispatcher HTTP, retry ou backoff nesta fase.
 
 Validacao executada:
 
@@ -627,10 +651,10 @@ Pendencias tecnicas:
 ## 18. Plano Coordenado da Vertical de Verificacao Manual
 
 Status em 2026-05-25:
-a vertical de verificacao manual esta implementada no backend com dominio, caso de uso, persistencia, endpoints REST e cobertura adicional de query/controller. O gate remanescente e a validacao HTTP real registrada pelo `coordinator`.
+a vertical de verificacao manual esta implementada no backend com dominio, caso de uso, persistencia, endpoints REST, filtros minimos, abertura automatica de divergencia e cobertura adicional de query/controller. A validacao HTTP real ja foi registrada pelo `coordinator`.
 
 Decisao de coordenacao:
-antes de evoluir para coletor MySQL, canonicalizacao automatica ou divergencias persistidas, a equipe deve fechar a primeira fatia auditavel com integracao Angular, testes de controller e contrato refinado.
+antes de evoluir para coletor MySQL, canonicalizacao automatica ou notificacao outbound ao legado, a equipe deve fechar a fatia operacional atual com divergencia persistida, integracao Angular, testes e contrato refinado.
 
 Delegacoes registradas:
 

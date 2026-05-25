@@ -6,9 +6,16 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.time.Clock;
+
 @TestConfiguration
 @EnableMethodSecurity
 public class TestSecurityConfig {
+
+    @Bean
+    Clock clock() {
+        return Clock.systemUTC();
+    }
 
     @Bean
     SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {

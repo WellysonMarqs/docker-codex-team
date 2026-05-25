@@ -1,6 +1,7 @@
 package com.customizationaudit.verification.application;
 
 import com.customizationaudit.verification.domain.VerificationResult;
+import com.customizationaudit.verification.domain.VerificationRun;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,7 +26,12 @@ public class ListVerificationRunsQuery {
 
     @Transactional(readOnly = true)
     public List<VerificationExecution> list() {
-        return verificationRunRepository.findAll().stream()
+        return list(null, null);
+    }
+
+    @Transactional(readOnly = true)
+    public List<VerificationExecution> list(UUID customerId, UUID environmentId) {
+        return loadRuns(customerId, environmentId).stream()
                 .sorted(Comparator.comparing(run -> run.startedAt(), Comparator.reverseOrder()))
                 .map(run -> new VerificationExecution(
                         run,
@@ -45,5 +51,18 @@ public class ListVerificationRunsQuery {
         return verificationResultRepository.findByVerificationRunId(verificationRunId).stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("verification result not found"));
+    }
+
+    private List<VerificationRun> loadRuns(UUID customerId, UUID environmentId) {
+        if (customerId != null && environmentId != null) {
+            return verificationRunRepository.findByCustomerIdAndEnvironmentId(customerId, environmentId);
+        }
+        if (customerId != null) {
+            return verificationRunRepository.findByCustomerId(customerId);
+        }
+        if (environmentId != null) {
+            return verificationRunRepository.findByEnvironmentId(environmentId);
+        }
+        return verificationRunRepository.findAll();
     }
 }

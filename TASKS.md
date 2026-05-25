@@ -689,7 +689,7 @@ Atualizar `README.md`, `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` e `API_CONT
 
 Responsavel: `architect`, `backend_dev`, `frontend_dev` e `coordinator`.
 
-Status: Em andamento.
+Status: Concluida.
 
 Contexto:
 O backend ja possui `VerificationRun` e `VerificationResult` com persistencia, contrato REST e cobertura de service/query/controller. O frontend passou a expor o fluxo no dashboard em 2026-05-25, e a vertical ainda depende da validacao HTTP real pelo `coordinator`.
@@ -702,6 +702,7 @@ Escopo:
 - Validar e endurecer o backend ja implementado.
 - Integrar Angular para criar, listar e consultar verificacoes manuais.
 - Registrar historico e resultado na documentacao funcional e tecnica.
+- Expor filtros minimos de historico por cliente e ambiente para o dashboard.
 
 Fora de escopo:
 - Coleta real de definicoes do MySQL.
@@ -716,7 +717,7 @@ Criterios de aceite:
 - [x] Backend possui testes web slice para os endpoints de verificacao.
 - [x] Frontend Angular permite disparar verificacao manual a partir de versao oficial selecionada.
 - [x] Frontend Angular exibe historico e resultado da verificacao.
-- [ ] Validacao HTTP real dos endpoints de verificacao registrada pelo `coordinator`.
+- [x] Validacao HTTP real dos endpoints de verificacao registrada pelo `coordinator`.
 - [x] Documentacao obrigatoria sincronizada com o estado real da vertical.
 
 Impacto em arquitetura:
@@ -733,6 +734,140 @@ Atualizar `README.md`, `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` e `API_CONT
 
 Observacao de andamento em 2026-05-25:
 o dashboard Angular foi reorganizado com menu lateral por etapas e contexto persistente para corrigir a quebra de layout causada pela concentracao de formularios e listagens em uma unica pagina larga.
+Os web slice tests do backend tambem foram estabilizados com `Clock` compartilhado em `TestSecurityConfig`, removendo uma quebra operacional do rebuild local.
+A validacao HTTP real foi registrada com uma execucao `MATCH` persistida em `verification-runs` na stack Docker local.
+O historico de verificacoes agora aceita filtros opcionais por `customerId` e `environmentId`, consumidos pelo dashboard no contexto selecionado.
+
+### TASK-017: Persistir divergencias a partir de verificacoes manuais divergentes
+
+Responsavel: `backend_dev`, `frontend_dev` e `coordinator`.
+
+Status: Concluida.
+
+Contexto:
+A verificacao manual auditavel ja persiste `VerificationRun` e `VerificationResult`. Falta materializar o artefato operacional de divergencia para preparar tratamento e futura notificacao ao legado.
+
+Problema que resolve:
+Transforma um resultado `DIVERGENT` em `Divergence` persistida, consultavel por API e visivel no dashboard.
+
+Escopo:
+- Persistir `Divergence` automaticamente quando uma verificacao resultar em `DIVERGENT`.
+- Expor `GET /api/v1/divergences` e `GET /api/v1/divergences/{divergenceId}`.
+- Permitir filtros minimos por cliente e ambiente.
+- Exibir divergencias no frontend Angular.
+
+Fora de escopo:
+- Notificacao automatica ao legado.
+- Severidade dinamica por regra de negocio.
+
+Criterios de aceite:
+- [x] Verificacao `DIVERGENT` cria `Divergence` persistida no backend.
+- [x] `GET /api/v1/divergences` lista divergencias persistidas.
+- [x] `GET /api/v1/divergences/{divergenceId}` consulta detalhe da divergencia.
+- [x] Backend possui testes unitarios e web slice da vertical.
+- [x] Frontend Angular exibe divergencias do contexto selecionado.
+- [x] Validacao HTTP real dos endpoints de divergencia registrada.
+- [x] Documentacao obrigatoria sincronizada com o estado real da vertical.
+
+Impacto em arquitetura:
+Medio. Materializa o bounded context de divergencias sem acoplar ainda notificacao outbound.
+
+Impacto em contratos:
+Medio. Promove `divergences` de candidato para implementado inicialmente.
+
+Testes obrigatorios:
+Backend `mvn verify`; frontend lint/build; validacao HTTP real contra stack Docker.
+
+Documentacao:
+Atualizar `README.md`, `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` e `API_CONTRACT.md`.
+
+### TASK-018: Permitir tratamento minimo de divergencias por status
+
+Responsavel: `backend_dev`, `frontend_dev` e `coordinator`.
+
+Status: Concluida.
+
+Contexto:
+Depois de materializar `Divergence`, o suporte ainda ficava sem forma de registrar andamento operacional no sistema.
+
+Problema que resolve:
+Permite reconhecer e resolver divergencias sem sair do fluxo atual do dashboard.
+
+Escopo:
+- Expor `PATCH /api/v1/divergences/{divergenceId}/status`.
+- Permitir inicialmente transicoes para `ACKNOWLEDGED` e `RESOLVED`.
+- Persistir `resolvedAt` quando a divergencia for resolvida.
+- Exibir acoes operacionais minimas no frontend Angular.
+
+Fora de escopo:
+- Notificacao automatica ao legado.
+- Workflow completo com justificativa para `IGNORED_WITH_JUSTIFICATION`.
+- Historico detalhado de transicoes.
+
+Criterios de aceite:
+- [x] Backend aceita `PATCH /api/v1/divergences/{divergenceId}/status`.
+- [x] `ACKNOWLEDGED` persiste sem `resolvedAt`.
+- [x] `RESOLVED` persiste com `resolvedAt`.
+- [x] Backend possui testes de dominio, aplicacao e web slice para as transicoes.
+- [x] Frontend Angular permite reconhecer e resolver divergencias.
+- [x] Validacao HTTP real registrada para `OPEN -> ACKNOWLEDGED -> RESOLVED`.
+- [x] Documentacao obrigatoria sincronizada com o estado real da vertical.
+
+Impacto em arquitetura:
+Medio. Fecha o ciclo operacional minimo do bounded context de divergencias sem introduzir orquestracao externa.
+
+Impacto em contratos:
+Medio. Promove o endpoint de patch de divergencia de candidato para implementado inicialmente.
+
+Testes obrigatorios:
+Backend `mvn verify`; frontend lint/build; validacao HTTP real contra stack Docker.
+
+Documentacao:
+Atualizar `README.md`, `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` e `API_CONTRACT.md`.
+
+### TASK-019: Persistir outbox inicial de notificacao ao legado
+
+Responsavel: `backend_dev`, `frontend_dev` e `coordinator`.
+
+Status: Concluida.
+
+Contexto:
+Depois de abrir e tratar `Divergence`, ainda faltava a trilha transacional que prepara a integracao futura com o legado.
+
+Problema que resolve:
+Materializa a tentativa de notificacao ao legado como outbox persistido, consultavel por API e visivel no dashboard.
+
+Escopo:
+- Persistir `LegacyNotification` automaticamente quando uma `Divergence` for criada.
+- Expor `GET /api/v1/legacy-notifications` e `GET /api/v1/legacy-notifications/{legacyNotificationId}`.
+- Permitir filtros minimos por cliente e ambiente.
+- Exibir `legacy-notifications` no frontend Angular.
+
+Fora de escopo:
+- Dispatcher HTTP outbound para o legado.
+- Retry, backoff e circuit breaker.
+- Atualizacao de status para `SENT` ou `FAILED`.
+
+Criterios de aceite:
+- [x] Verificacao `DIVERGENT` cria `LegacyNotification` persistida com `status=PENDING`.
+- [x] `GET /api/v1/legacy-notifications` lista notificacoes persistidas.
+- [x] `GET /api/v1/legacy-notifications/{legacyNotificationId}` consulta detalhe da notificacao persistida.
+- [x] Backend possui testes unitarios e web slice da vertical.
+- [x] Frontend Angular exibe `legacy-notifications` do contexto selecionado.
+- [x] Validacao HTTP real registrada para criacao e consulta do outbox.
+- [x] Documentacao obrigatoria sincronizada com o estado real da vertical.
+
+Impacto em arquitetura:
+Medio. Materializa o outbox de notificacao sem introduzir ainda integracao outbound.
+
+Impacto em contratos:
+Medio. Promove `legacy-notifications` de candidato para implementado inicialmente.
+
+Testes obrigatorios:
+Backend `mvn verify`; frontend lint/build; validacao HTTP real contra stack Docker.
+
+Documentacao:
+Atualizar `README.md`, `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` e `API_CONTRACT.md`.
 
 ### TASK-006: Refinar estrategia de hashing e canonicalizacao SQL
 

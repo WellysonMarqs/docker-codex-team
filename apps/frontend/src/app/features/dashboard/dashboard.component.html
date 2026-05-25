@@ -56,6 +56,8 @@
         <p *ngIf="activeSection() === 'customizations'">Cada customizacao precisa de cliente e ambiente.</p>
         <p *ngIf="activeSection() === 'versions'">Cada versao oficial depende de uma customizacao selecionada.</p>
         <p *ngIf="activeSection() === 'verifications'">A verificacao exige cliente, ambiente e versao oficial.</p>
+        <p *ngIf="activeSection() === 'divergences'">As divergencias refletem verificacoes com resultado diferente do hash oficial.</p>
+        <p *ngIf="activeSection() === 'notifications'">As notificacoes persistidas formam a trilha de envio futura para o legado.</p>
       </div>
     </aside>
 
@@ -420,6 +422,112 @@
                 <td>{{ verificationRun.status }}</td>
                 <td>{{ verificationRun.requestedBy || '-' }}</td>
                 <td>{{ verificationRun.startedAt | date: 'short' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+      <section class="content-grid" *ngIf="activeSection() === 'divergences'">
+        <section class="panel form-panel">
+          <div class="panel-header">
+            <h2>Contexto de consulta</h2>
+          </div>
+          <p class="empty">
+            O historico abaixo acompanha automaticamente o cliente e o ambiente selecionados nas etapas anteriores.
+          </p>
+        </section>
+
+        <section class="panel list-panel">
+          <div class="panel-header">
+            <h2>Divergencias abertas na trilha</h2>
+            <span>{{ relevantDivergences().length }} itens</span>
+          </div>
+
+          <p class="empty" *ngIf="relevantDivergences().length === 0 && !loading()">Nenhuma divergencia registrada.</p>
+
+          <table *ngIf="relevantDivergences().length > 0">
+            <thead>
+              <tr>
+                <th>Customizacao</th>
+                <th>Severidade</th>
+                <th>Status</th>
+                <th>Correlation ID</th>
+                <th>Detectada em</th>
+                <th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let divergence of relevantDivergences(); trackBy: trackById">
+                <td>{{ customizationName(divergence.customizationId) }}</td>
+                <td>{{ divergence.severity }}</td>
+                <td>{{ divergence.status }}</td>
+                <td>{{ divergence.correlationId || '-' }}</td>
+                <td>{{ divergence.detectedAt | date: 'short' }}</td>
+                <td class="actions-cell">
+                  <button
+                    type="button"
+                    class="secondary-action"
+                    *ngIf="canAcknowledge(divergence)"
+                    [disabled]="loading()"
+                    (click)="updateDivergenceStatus(divergence.id, 'ACKNOWLEDGED')"
+                  >
+                    Reconhecer
+                  </button>
+                  <button
+                    type="button"
+                    class="secondary-action"
+                    *ngIf="canResolve(divergence)"
+                    [disabled]="loading()"
+                    (click)="updateDivergenceStatus(divergence.id, 'RESOLVED')"
+                  >
+                    Resolver
+                  </button>
+                  <span class="empty" *ngIf="!canAcknowledge(divergence) && !canResolve(divergence)">Sem acao</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+      </section>
+
+      <section class="content-grid" *ngIf="activeSection() === 'notifications'">
+        <section class="panel form-panel">
+          <div class="panel-header">
+            <h2>Contexto de outbox</h2>
+          </div>
+          <p class="empty">
+            A listagem abaixo acompanha automaticamente o cliente e o ambiente selecionados nas etapas anteriores.
+          </p>
+        </section>
+
+        <section class="panel list-panel">
+          <div class="panel-header">
+            <h2>Notificacoes ao legado</h2>
+            <span>{{ relevantLegacyNotifications().length }} itens</span>
+          </div>
+
+          <p class="empty" *ngIf="relevantLegacyNotifications().length === 0 && !loading()">Nenhuma notificacao registrada.</p>
+
+          <table *ngIf="relevantLegacyNotifications().length > 0">
+            <thead>
+              <tr>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Tentativas</th>
+                <th>Idempotencia</th>
+                <th>Correlation ID</th>
+                <th>Criada em</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let notification of relevantLegacyNotifications(); trackBy: trackById">
+                <td>{{ notification.type }}</td>
+                <td>{{ notification.status }}</td>
+                <td>{{ notification.attempts }}</td>
+                <td class="hash">{{ notification.idempotencyKey }}</td>
+                <td>{{ notification.correlationId || '-' }}</td>
+                <td>{{ notification.createdAt | date: 'short' }}</td>
               </tr>
             </tbody>
           </table>

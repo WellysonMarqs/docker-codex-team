@@ -189,9 +189,11 @@ Endpoints administrativos:
 - `POST /api/v1/verification-runs`: implementado no backend.
 - `GET /api/v1/verification-runs`: implementado no backend.
 - `GET /api/v1/verification-runs/{verificationRunId}`: implementado no backend.
-- `GET /api/v1/divergences`
-- `GET /api/v1/divergences/{divergenceId}`
-- `PATCH /api/v1/divergences/{divergenceId}`
+- `GET /api/v1/divergences`: implementado no backend.
+- `GET /api/v1/divergences/{divergenceId}`: implementado no backend.
+- `PATCH /api/v1/divergences/{divergenceId}/status`: implementado no backend.
+- `GET /api/v1/legacy-notifications`: implementado no backend.
+- `GET /api/v1/legacy-notifications/{legacyNotificationId}`: implementado no backend.
 
 Endpoints candidatos para agente on-premise:
 
@@ -477,6 +479,13 @@ Semantica de `collectionMode` no recurso de ambiente:
 Observacao de UX:
 o frontend foi reorganizado com menu lateral por etapas dentro da mesma rota para reduzir densidade horizontal, sem alterar payloads, recursos ou semantica REST.
 
+Observacao de erro padronizado:
+os erros REST desta fase continuam sendo emitidos pelo `GlobalExceptionHandler` com timestamp UTC derivado de `Clock`, e esse contrato agora permanece coberto tambem nos web slice tests.
+
+Validacao operacional registrada em 2026-05-25:
+o contrato acima foi exercitado contra a stack Docker local com uma chamada real de criacao seguida de listagem e consulta por id, retornando `COMPLETED` com `result.status=MATCH`.
+Tambem foi validada a listagem filtrada por `customerId` e `environmentId`.
+
 ### POST /api/v1/verification-runs
 
 Cria uma verificacao manual auditavel comparando o hash informado manualmente com o hash oficial da versao selecionada. Nesta etapa nao ha coleta MySQL nem canonicalizacao automatica.
@@ -537,6 +546,11 @@ Autorizacao:
 ### GET /api/v1/verification-runs
 
 Lista o historico de verificacoes manuais registradas.
+
+Query params opcionais:
+
+- `customerId`: restringe o historico ao cliente informado.
+- `environmentId`: restringe o historico ao ambiente informado.
 
 Response `200`:
 
@@ -604,6 +618,172 @@ Response `200`:
   }
 }
 ```
+
+Autorizacao:
+
+- Perfil padrao: exige autoridade `SCOPE_customizations:read`.
+- Perfil `local`: liberado apenas para desenvolvimento Docker local.
+
+### GET /api/v1/divergences
+
+Lista divergencias persistidas a partir de verificacoes divergentes.
+
+Query params opcionais:
+
+- `customerId`: restringe as divergencias ao cliente informado.
+- `environmentId`: restringe as divergencias ao ambiente informado.
+
+Response `200`:
+
+```json
+[
+  {
+    "id": "89b98761-98e1-4fb7-a0b8-7d7fb0e5b0d1",
+    "verificationResultId": "ff485c36-d95d-4421-8bea-0d7f7d32b3fd",
+    "customerId": "be6d92a0-c868-4bd7-a072-7a45a4f9772a",
+    "environmentId": "8877233b-e62f-428a-9f04-fb4a2c6ae86e",
+    "customizationId": "64255850-95f8-4c3d-b5e7-c6cba76e9810",
+    "severity": "HIGH",
+    "status": "OPEN",
+    "detectedAt": "2026-05-25T11:45:00Z",
+    "resolvedAt": null,
+    "correlationId": "manual-check-2026-05-25-003"
+  }
+]
+```
+
+Autorizacao:
+
+- Perfil padrao: exige autoridade `SCOPE_customizations:read`.
+- Perfil `local`: liberado apenas para desenvolvimento Docker local.
+
+### GET /api/v1/divergences/{divergenceId}
+
+Consulta o detalhe de uma divergencia persistida.
+
+Response `200`:
+
+```json
+{
+  "id": "89b98761-98e1-4fb7-a0b8-7d7fb0e5b0d1",
+  "verificationResultId": "ff485c36-d95d-4421-8bea-0d7f7d32b3fd",
+  "customerId": "be6d92a0-c868-4bd7-a072-7a45a4f9772a",
+  "environmentId": "8877233b-e62f-428a-9f04-fb4a2c6ae86e",
+  "customizationId": "64255850-95f8-4c3d-b5e7-c6cba76e9810",
+  "severity": "HIGH",
+  "status": "OPEN",
+  "detectedAt": "2026-05-25T11:45:00Z",
+  "resolvedAt": null,
+  "correlationId": "manual-check-2026-05-25-003"
+}
+```
+
+Validacao real registrada em 2026-05-25 na stack Docker local:
+
+- `POST /api/v1/verification-runs` com `currentHash=deadbeef` retornou `201` com `status=COMPLETED_WITH_DIVERGENCE`;
+- `GET /api/v1/divergences` retornou a divergencia `OPEN/HIGH` correlacionada por `manual-check-2026-05-25-003`;
+- `GET /api/v1/divergences?customerId=...&environmentId=...` retornou a mesma divergencia filtrada;
+- `GET /api/v1/divergences/{divergenceId}` retornou o detalhe persistido da divergencia aberta.
+
+### PATCH /api/v1/divergences/{divergenceId}/status
+
+Atualiza o status operacional minimo de uma divergencia persistida.
+
+Request:
+
+```json
+{
+  "status": "ACKNOWLEDGED"
+}
+```
+
+Status suportados nesta fase:
+
+- `ACKNOWLEDGED`
+- `RESOLVED`
+
+Response `200`:
+
+```json
+{
+  "id": "89b98761-98e1-4fb7-a0b8-7d7fb0e5b0d1",
+  "verificationResultId": "ff485c36-d95d-4421-8bea-0d7f7d32b3fd",
+  "customerId": "be6d92a0-c868-4bd7-a072-7a45a4f9772a",
+  "environmentId": "8877233b-e62f-428a-9f04-fb4a2c6ae86e",
+  "customizationId": "64255850-95f8-4c3d-b5e7-c6cba76e9810",
+  "severity": "HIGH",
+  "status": "RESOLVED",
+  "detectedAt": "2026-05-25T11:45:00Z",
+  "resolvedAt": "2026-05-25T11:54:18Z",
+  "correlationId": "manual-check-2026-05-25-004"
+}
+```
+
+Autorizacao:
+
+- Perfil padrao: exige autoridade `SCOPE_customizations:write`.
+- Perfil `local`: liberado apenas para desenvolvimento Docker local.
+
+Validacao real registrada em 2026-05-25 na stack Docker local:
+
+- `POST /api/v1/verification-runs` com `currentHash=facefeed` retornou `201` com `status=COMPLETED_WITH_DIVERGENCE`;
+- `PATCH /api/v1/divergences/{divergenceId}/status` retornou `ACKNOWLEDGED`;
+- `PATCH /api/v1/divergences/{divergenceId}/status` retornou `RESOLVED` com `resolvedAt` preenchido;
+- `GET /api/v1/divergences/{divergenceId}` confirmou o estado final `RESOLVED`.
+
+### GET /api/v1/legacy-notifications
+
+Lista notificacoes persistidas no outbox local para envio futuro ao legado.
+
+Query params opcionais:
+
+- `customerId`: restringe as notificacoes ao cliente informado.
+- `environmentId`: restringe as notificacoes ao ambiente informado.
+
+Response `200`:
+
+```json
+[
+  {
+    "id": "326e07c3-3bd2-47af-bbf8-0222756bfcff",
+    "divergenceId": "02170db6-2026-4065-a228-cfa1569e5679",
+    "customerId": "be6d92a0-c868-4bd7-a072-7a45a4f9772a",
+    "environmentId": "8877233b-e62f-428a-9f04-fb4a2c6ae86e",
+    "customizationId": "64255850-95f8-4c3d-b5e7-c6cba76e9810",
+    "type": "DIVERGENCE_DETECTED",
+    "status": "PENDING",
+    "payloadJson": "{\"divergenceId\":\"02170db6-2026-4065-a228-cfa1569e5679\"}",
+    "idempotencyKey": "02170db6-2026-4065-a228-cfa1569e5679",
+    "attempts": 0,
+    "createdAt": "2026-05-25T12:09:23Z",
+    "lastAttemptAt": null,
+    "sentAt": null,
+    "lastError": null,
+    "correlationId": "manual-check-2026-05-25-006"
+  }
+]
+```
+
+Autorizacao:
+
+- Perfil padrao: exige autoridade `SCOPE_customizations:read`.
+- Perfil `local`: liberado apenas para desenvolvimento Docker local.
+
+### GET /api/v1/legacy-notifications/{legacyNotificationId}
+
+Consulta o detalhe de uma notificacao persistida no outbox local.
+
+Autorizacao:
+
+- Perfil padrao: exige autoridade `SCOPE_customizations:read`.
+- Perfil `local`: liberado apenas para desenvolvimento Docker local.
+
+Validacao real registrada em 2026-05-25 na stack Docker local:
+
+- `POST /api/v1/verification-runs` com `currentHash=feedface` retornou `201` com `status=COMPLETED_WITH_DIVERGENCE`;
+- `GET /api/v1/legacy-notifications?customerId=...&environmentId=...` retornou a notificacao `PENDING` correlacionada por `manual-check-2026-05-25-006`;
+- `GET /api/v1/legacy-notifications/{legacyNotificationId}` retornou o detalhe do outbox persistido;
+- `payloadJson` inclui `legacySystemVersion`, `officialHash`, `currentHash`, `severity` e `correlationId`.
 
 Autorizacao:
 

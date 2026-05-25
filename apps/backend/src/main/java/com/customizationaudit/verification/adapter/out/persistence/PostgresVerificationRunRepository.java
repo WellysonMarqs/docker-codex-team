@@ -31,6 +31,27 @@ public class PostgresVerificationRunRepository implements VerificationRunReposit
     }
 
     @Override
+    public List<VerificationRun> findByCustomerId(UUID customerId) {
+        return verificationRunJpaRepository.findByCustomerId(customerId).stream()
+                .map(VerificationRunJpaEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<VerificationRun> findByEnvironmentId(UUID environmentId) {
+        return verificationRunJpaRepository.findByEnvironmentId(environmentId).stream()
+                .map(VerificationRunJpaEntity::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<VerificationRun> findByCustomerIdAndEnvironmentId(UUID customerId, UUID environmentId) {
+        return verificationRunJpaRepository.findByCustomerIdAndEnvironmentId(customerId, environmentId).stream()
+                .map(VerificationRunJpaEntity::toDomain)
+                .toList();
+    }
+
+    @Override
     public Optional<VerificationRun> findById(UUID id) {
         return verificationRunJpaRepository.findById(id).map(VerificationRunJpaEntity::toDomain);
     }

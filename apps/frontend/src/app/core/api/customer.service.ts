@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
@@ -12,6 +12,9 @@ import {
   CustomizationVersion,
   Customer,
   CustomerEnvironment,
+  Divergence,
+  LegacyNotification,
+  UpdateDivergenceStatusRequest,
   VerificationRun,
 } from './customer.model';
 
@@ -22,6 +25,8 @@ export class CustomerService {
   private readonly baseUrl = '/api/v1/customers';
   private readonly customizationBaseUrl = '/api/v1/customizations';
   private readonly verificationBaseUrl = '/api/v1/verification-runs';
+  private readonly divergenceBaseUrl = '/api/v1/divergences';
+  private readonly legacyNotificationBaseUrl = '/api/v1/legacy-notifications';
 
   constructor(private readonly httpClient: HttpClient) {
   }
@@ -69,11 +74,44 @@ export class CustomerService {
     );
   }
 
-  listVerificationRuns(): Observable<VerificationRun[]> {
-    return this.httpClient.get<VerificationRun[]>(this.verificationBaseUrl);
+  listVerificationRuns(customerId?: string, environmentId?: string): Observable<VerificationRun[]> {
+    let params = new HttpParams();
+    if (customerId) {
+      params = params.set('customerId', customerId);
+    }
+    if (environmentId) {
+      params = params.set('environmentId', environmentId);
+    }
+    return this.httpClient.get<VerificationRun[]>(this.verificationBaseUrl, { params });
   }
 
   createVerificationRun(request: CreateVerificationRunRequest): Observable<VerificationRun> {
     return this.httpClient.post<VerificationRun>(this.verificationBaseUrl, request);
+  }
+
+  listDivergences(customerId?: string, environmentId?: string): Observable<Divergence[]> {
+    let params = new HttpParams();
+    if (customerId) {
+      params = params.set('customerId', customerId);
+    }
+    if (environmentId) {
+      params = params.set('environmentId', environmentId);
+    }
+    return this.httpClient.get<Divergence[]>(this.divergenceBaseUrl, { params });
+  }
+
+  updateDivergenceStatus(divergenceId: string, request: UpdateDivergenceStatusRequest): Observable<Divergence> {
+    return this.httpClient.patch<Divergence>(`${this.divergenceBaseUrl}/${divergenceId}/status`, request);
+  }
+
+  listLegacyNotifications(customerId?: string, environmentId?: string): Observable<LegacyNotification[]> {
+    let params = new HttpParams();
+    if (customerId) {
+      params = params.set('customerId', customerId);
+    }
+    if (environmentId) {
+      params = params.set('environmentId', environmentId);
+    }
+    return this.httpClient.get<LegacyNotification[]>(this.legacyNotificationBaseUrl, { params });
   }
 }

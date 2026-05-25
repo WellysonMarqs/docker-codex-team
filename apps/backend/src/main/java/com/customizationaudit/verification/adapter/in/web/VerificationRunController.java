@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -55,8 +56,14 @@ public class VerificationRunController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('SCOPE_customizations:read')")
-    public List<VerificationRunResponse> list() {
-        return listVerificationRunsQuery.list().stream()
+    public List<VerificationRunResponse> list(
+            @RequestParam(required = false) UUID customerId,
+            @RequestParam(required = false) UUID environmentId
+    ) {
+        List<VerificationExecution> executions = customerId == null && environmentId == null
+                ? listVerificationRunsQuery.list()
+                : listVerificationRunsQuery.list(customerId, environmentId);
+        return executions.stream()
                 .map(VerificationRunResponse::from)
                 .toList();
     }

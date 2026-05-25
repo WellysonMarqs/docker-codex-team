@@ -664,6 +664,15 @@ os modos de coleta persistidos em `CustomerEnvironment` representam uma decisao 
 Decisao adicional de UX:
 o dashboard Angular permanece em rota unica, mas a operacao foi segmentada por etapas com menu lateral e contexto persistente para evitar a quebra de layout em telas de 16 polegadas ou menores e reduzir a competicao horizontal entre formularios e tabelas.
 
+Decisao adicional de testabilidade:
+o backend padroniza `Clock` como dependencia explicita tambem no tratamento global de erro, e os `WebMvcTest` reutilizam esse contrato via `TestSecurityConfig` para evitar falsos negativos no rebuild local.
+
+Evidencia operacional em 2026-05-25:
+com a estabilizacao acima, a stack Docker voltou a subir com backend e frontend juntos, e a validacao HTTP real de `verification-runs` foi executada com sucesso no fluxo `MATCH`.
+
+Decisao adicional de contrato:
+o historico de `verification-runs` nesta fase aceita filtros opcionais por `customerId` e `environmentId`, suficientes para o dashboard consultar o contexto selecionado sem antecipar paginacao ou busca mais ampla.
+
 ## ADR-026: Verificacao manual persiste um resultado por execucao nesta fase
 
 Status: Aceita.
@@ -686,3 +695,78 @@ Trade-offs:
 Alternativas avaliadas:
 - Permitir varios resultados por execucao ja nesta fase: descartada por adicionar complexidade sem caso de uso aprovado.
 - Persistir somente `VerificationRun` e calcular o resultado em memoria: descartada por enfraquecer a auditoria.
+
+## ADR-027: Divergencia persistida automaticamente para resultado manual `DIVERGENT`
+
+Status: Aceita.
+
+Implementacao inicial validada em 2026-05-25:
+- `POST /api/v1/verification-runs` com hash divergente abriu `Divergence` persistida com `status=OPEN` e `severity=HIGH`;
+- `GET /api/v1/divergences`, `GET /api/v1/divergences?customerId=...&environmentId=...` e `GET /api/v1/divergences/{divergenceId}` foram exercitados com sucesso na stack Docker local.
+
+Decisao:
+Ao concluir uma verificacao manual com `VerificationResultStatus.DIVERGENT`, o backend deve persistir automaticamente uma `Divergence` com `status=OPEN` e `severity=HIGH`, sem acionar ainda notificacao automatica ao legado.
+
+Motivo:
+Depois do fechamento operacional de `TASK-016`, a proxima evolucao natural do bounded context e materializar a divergencia auditavel no PostgreSQL. Isso preserva historico tratavel e prepara a futura fila de notificacoes sem introduzir ainda retry, idempotencia outbound ou workflow manual mais complexo.
+
+Beneficios:
+- conecta verificacao e tratamento operacional;
+- prepara endpoints reais de consulta de divergencias;
+- reduz perda de contexto entre um resultado `DIVERGENT` e a acao de suporte;
+- mantem a evolucao incremental sem depender de coletor MySQL.
+
+Trade-offs:
+- a severidade inicial fica fixa em `HIGH` nesta fase;
+- lifecycle de tratamento continua minimo, sem patch de status;
+- notificacao ao legado permanece pendente.
+
+Alternativas avaliadas:
+- Continuar sem persistir divergencia: descartada por deixar o resultado `DIVERGENT` sem artefato operacional proprio.
+- Implementar notificacao automatica no mesmo passo: descartada por aumentar demais o escopo e depender de contrato outbound ainda aberto.
+
+## ADR-028: Tratamento minimo de divergencia com transicao manual de status
+
+Status: Aceita.
+
+Decisao:
+Depois da criacao automatica da `Divergence`, o backend deve permitir transicao manual minima por `PATCH /api/v1/divergences/{divergenceId}/status`, aceitando inicialmente `ACKNOWLEDGED` e `RESOLVED`.
+
+Motivo:
+Uma divergencia perpetuamente em `OPEN` nao fecha o ciclo operacional. A transicao minima torna o artefato tratavel pelo suporte sem antecipar workflow completo, notificacao outbound ou justificativas estruturadas.
+
+Beneficios:
+- fecha o loop operacional basico;
+- mantem o dashboard util para acompanhamento real;
+- prepara futura evolucao para notificacao, historico de tratamento e regras mais finas.
+
+Trade-offs:
+- o lifecycle continua parcial, sem `NOTIFIED` automatizado;
+- `IGNORED_WITH_JUSTIFICATION` continua adiado por ainda nao haver campo de justificativa.
+
+Alternativas avaliadas:
+- Manter apenas `OPEN`: descartada por limitar utilidade operacional da vertical.
+- Implementar workflow completo de tratamento agora: descartada por ampliar demais o escopo.
+
+## ADR-029: Persistir `legacy-notifications` como outbox antes do envio outbound
+
+Status: Aceita.
+
+Decisao:
+Ao criar uma `Divergence`, o backend deve persistir automaticamente uma `LegacyNotification` com `status=PENDING`, `type=DIVERGENCE_DETECTED`, payload JSON auditavel e `idempotencyKey` baseada em `divergenceId`, sem executar ainda o envio HTTP ao legado.
+
+Motivo:
+O proximo passo coerente nao e disparar integracao externa diretamente do caso de uso, mas materializar primeiro o outbox transacional. Isso preserva rastreabilidade, prepara retry futuro e reduz acoplamento com indisponibilidade do legado.
+
+Beneficios:
+- cria trilha auditavel para notificacoes futuras;
+- prepara dispatcher HTTP assíncrono sem mudar o modelo principal;
+- permite UI e API de acompanhamento operacional.
+
+Trade-offs:
+- ainda nao existe entrega real ao legado;
+- `attempts`, `sentAt` e `lastError` permanecem inertes ate a vertical de dispatch.
+
+Alternativas avaliadas:
+- Enviar HTTP no mesmo fluxo da verificacao: descartada por acoplamento temporal e risco operacional.
+- Adiar qualquer persistencia de notificacao: descartada por deixar a fase seguinte sem base transacional.

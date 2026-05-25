@@ -303,6 +303,20 @@ tbody tr {
   cursor: pointer;
 }
 
+.actions-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.secondary-action {
+  padding: 8px 10px;
+  background: #eef5ff;
+  color: #1558bf;
+  border: 1px solid #c7dafb;
+}
+
 tbody tr.selected {
   background: #eef5ff;
 }

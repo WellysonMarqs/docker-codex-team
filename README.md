@@ -54,12 +54,19 @@ O scaffold inicial implementa os primeiros fluxos verticais de governanca:
 - migracao Flyway `V4__create_customization_versions.sql`;
 - migracao Flyway `V5__create_verification_runs.sql`;
 - migracao Flyway `V6__create_verification_results.sql`;
+- migracao Flyway `V7__create_divergences.sql`;
+- migracao Flyway `V8__create_legacy_notifications.sql`;
 - endpoints `POST /api/v1/customers` e `GET /api/v1/customers`;
 - endpoints `POST /api/v1/customers/{customerId}/environments` e `GET /api/v1/customers/{customerId}/environments`;
 - endpoints `POST /api/v1/customizations` e `GET /api/v1/customizations`;
 - endpoints `POST /api/v1/customizations/{customizationId}/versions` e `GET /api/v1/customizations/{customizationId}/versions`;
 - endpoints `POST /api/v1/verification-runs`, `GET /api/v1/verification-runs` e `GET /api/v1/verification-runs/{verificationRunId}`;
+- `GET /api/v1/verification-runs` aceita filtros opcionais por `customerId` e `environmentId`;
+- endpoints `GET /api/v1/divergences`, `GET /api/v1/divergences/{divergenceId}` e `PATCH /api/v1/divergences/{divergenceId}/status`;
+- endpoints `GET /api/v1/legacy-notifications` e `GET /api/v1/legacy-notifications/{legacyNotificationId}`;
 - UI inicial com menu lateral por etapas para cadastrar/listar clientes, ambientes, customizacoes oficiais, versoes oficiais e verificacoes manuais auditaveis sem concentrar todos os formularios em uma unica grade horizontal.
+- UI inicial inclui acompanhamento de divergencias persistidas por cliente e ambiente, com acoes de reconhecimento e resolucao diretamente na etapa de divergencias.
+- UI inicial inclui acompanhamento do outbox `legacy-notifications` por cliente e ambiente.
 
 Subir a stack:
 
@@ -86,22 +93,39 @@ cd apps/frontend && npm run lint
 cd apps/frontend && npm run build
 ```
 
+Validacao HTTP real registrada em 2026-05-25:
+- `POST /api/v1/verification-runs` retornando `201` com `status=COMPLETED` e `result.status=MATCH`;
+- `GET /api/v1/verification-runs` retornando a execucao persistida;
+- `GET /api/v1/verification-runs/{verificationRunId}` retornando o detalhe da mesma execucao.
+- `GET /api/v1/verification-runs?customerId=...&environmentId=...` retornando o historico filtrado do contexto selecionado.
+- `POST /api/v1/verification-runs` com hash divergente retornando `201` com `status=COMPLETED_WITH_DIVERGENCE` e `result.status=DIVERGENT`;
+- `GET /api/v1/divergences` retornando a divergencia persistida automaticamente;
+- `GET /api/v1/divergences?customerId=...&environmentId=...` retornando a divergencia filtrada do contexto selecionado;
+- `GET /api/v1/divergences/{divergenceId}` retornando o detalhe da divergencia aberta.
+- `PATCH /api/v1/divergences/{divergenceId}/status` retornando `ACKNOWLEDGED` e depois `RESOLVED` com `resolvedAt` persistido.
+- `GET /api/v1/legacy-notifications` retornando a tentativa persistida de notificacao ao legado;
+- `GET /api/v1/legacy-notifications/{legacyNotificationId}` retornando o detalhe do outbox persistido;
+- `POST /api/v1/verification-runs` com hash divergente retornando `201` e criando `legacy-notification` `PENDING` com `attempts=0`.
+
 Observacao:
 o perfil Docker do backend usa `SPRING_PROFILES_ACTIVE=local` para permitir desenvolvimento sem provedor OAuth local. O perfil padrao mantem Resource Server JWT e RBAC por escopos.
 
 Observacao sobre coleta:
 os tres modos acima ja sao persistidos no cadastro de ambiente, mas a coleta automatica MySQL ainda nao foi implementada. Hoje o sistema usa essa informacao como decisao arquitetural do ambiente e oferece apenas a verificacao manual auditavel por hash.
 
+Observacao sobre testes backend:
+os web slice tests usam `TestSecurityConfig` com `Clock` compartilhado para manter o `GlobalExceptionHandler` deterministico e evitar quebra do rebuild local quando o tratamento global de erro exige timestamp injetado.
+
 ## Proximo Passo
 
-Prioridade atual do `coordinator`: validar a vertical de verificacao manual auditavel ponta a ponta antes de implementar coletor MySQL, canonicalizacao automatica ou divergencias persistidas.
+Prioridade atual do `coordinator`: evoluir do outbox persistido para envio outbound controlado ao legado, sem romper a fase atual que ainda permanece sem coletor MySQL e sem canonicalizacao automatica.
 
 Delegacoes aprovadas:
 
 - `architect`: consolidar o contrato da verificacao manual auditavel, incluindo semantica de `MATCH` e `DIVERGENT`, evidencias, filtros minimos de consulta e modelo de erro esperado nesta fase sem coletor.
 - `backend_dev`: endurecimento principal concluido em 2026-05-25, cobrindo controller/web slice, correcoes de compilacao e coerencia de servico/contrato; a validacao HTTP real dos endpoints segue como gate operacional do `coordinator`.
 - `frontend_dev`: integracao Angular concluida em 2026-05-25 no dashboard principal, consumindo `POST /api/v1/verification-runs`, `GET /api/v1/verification-runs` e `GET /api/v1/verification-runs/{verificationRunId}` sem quebrar a arquitetura atual de tela unica.
-- `coordinator`: validar integracao ponta a ponta, manter contratos/documentacao sincronizados e bloquear qualquer salto prematuro para coletor MySQL ou canonicalizacao automatica.
+- `coordinator`: validar integracao ponta a ponta, manter contratos/documentacao sincronizados e conduzir a proxima fatia operacional sem antecipar coletor MySQL ou canonicalizacao automatica.
 
 ## Docker Agent
 

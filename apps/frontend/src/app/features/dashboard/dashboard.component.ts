@@ -10,12 +10,22 @@ import {
   CreateVerificationRunRequest,
   Customer,
   CustomerEnvironment,
+  Divergence,
+  DivergenceStatus,
   EnvironmentType,
+  LegacyNotification,
   VerificationRun,
 } from '../../core/api/customer.model';
 import { CustomerService } from '../../core/api/customer.service';
 
-type WorkspaceSection = 'customers' | 'environments' | 'customizations' | 'versions' | 'verifications';
+type WorkspaceSection =
+  | 'customers'
+  | 'environments'
+  | 'customizations'
+  | 'versions'
+  | 'verifications'
+  | 'divergences'
+  | 'notifications';
 
 interface WorkspaceTab {
   id: WorkspaceSection;
@@ -41,6 +51,8 @@ export class DashboardComponent implements OnInit {
   protected readonly customizations = signal<Customization[]>([]);
   protected readonly customizationVersions = signal<CustomizationVersion[]>([]);
   protected readonly verificationRuns = signal<VerificationRun[]>([]);
+  protected readonly divergences = signal<Divergence[]>([]);
+  protected readonly legacyNotifications = signal<LegacyNotification[]>([]);
   protected readonly selectedCustomerId = signal<string | null>(null);
   protected readonly selectedEnvironmentId = signal<string | null>(null);
   protected readonly selectedCustomizationId = signal<string | null>(null);
@@ -51,6 +63,8 @@ export class DashboardComponent implements OnInit {
     { id: 'customizations', label: 'Customizacoes', hint: 'Objetos oficiais' },
     { id: 'versions', label: 'Versoes', hint: 'Hash oficial e canon' },
     { id: 'verifications', label: 'Verificacoes', hint: 'Historico auditavel' },
+    { id: 'divergences', label: 'Divergencias', hint: 'Tratamento operacional' },
+    { id: 'notifications', label: 'Notificacoes', hint: 'Outbox para legado' },
   ];
   protected readonly activeTab = computed(
     () => this.tabs.find((tab) => tab.id === this.activeSection()) ?? this.tabs[0],
@@ -99,6 +113,8 @@ export class DashboardComponent implements OnInit {
       return true;
     });
   });
+  protected readonly relevantDivergences = computed(() => this.divergences());
+  protected readonly relevantLegacyNotifications = computed(() => this.legacyNotifications());
   protected readonly customerForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(160)]],
     externalReference: ['', [Validators.maxLength(80)]],
@@ -134,6 +150,8 @@ export class DashboardComponent implements OnInit {
     this.loadCustomers();
     this.loadCustomizations();
     this.loadVerificationRuns();
+    this.loadDivergences();
+    this.loadLegacyNotifications();
   }
 
   protected setActiveSection(section: WorkspaceSection): void {
@@ -181,6 +199,9 @@ export class DashboardComponent implements OnInit {
     this.selectedCustomizationId.set(null);
     this.selectedCustomizationVersionId.set(null);
     this.customizationVersions.set([]);
+    this.loadVerificationRuns(this.selectedCustomerId(), environmentId);
+    this.loadDivergences(this.selectedCustomerId(), environmentId);
+    this.loadLegacyNotifications(this.selectedCustomerId(), environmentId);
   }
 
   protected selectCustomization(customizationId: string): void {
@@ -356,11 +377,39 @@ export class DashboardComponent implements OnInit {
           correlationId: '',
         });
         this.verificationRuns.update((runs) => [verificationRun, ...runs]);
+        this.loadDivergences(this.selectedCustomerId(), this.selectedEnvironmentId());
+        this.loadLegacyNotifications(this.selectedCustomerId(), this.selectedEnvironmentId());
         this.loading.set(false);
       },
       error: () => {
         this.loading.set(false);
         this.errorMessage.set('Nao foi possivel registrar a verificacao manual.');
+      },
+    });
+  }
+
+  protected canAcknowledge(divergence: Divergence): boolean {
+    return divergence.status === 'OPEN';
+  }
+
+  protected canResolve(divergence: Divergence): boolean {
+    return divergence.status === 'OPEN' || divergence.status === 'ACKNOWLEDGED';
+  }
+
+  protected updateDivergenceStatus(divergenceId: string, status: DivergenceStatus): void {
+    this.loading.set(true);
+    this.errorMessage.set(null);
+
+    this.customerService.updateDivergenceStatus(divergenceId, { status }).subscribe({
+      next: (updated) => {
+        this.divergences.update((divergences) =>
+          divergences.map((divergence) => (divergence.id === updated.id ? updated : divergence)),
+        );
+        this.loading.set(false);
+      },
+      error: () => {
+        this.loading.set(false);
+        this.errorMessage.set('Nao foi possivel atualizar a divergencia.');
       },
     });
   }
@@ -397,6 +446,10 @@ export class DashboardComponent implements OnInit {
     return false;
   }
 
+  protected customizationName(customizationId: string): string {
+    return this.customizations().find((customization) => customization.id === customizationId)?.name ?? this.shortId(customizationId);
+  }
+
   protected trackById(_: number, item: { id: string }): string {
     return item.id;
   }
@@ -430,10 +483,16 @@ export class DashboardComponent implements OnInit {
         this.environments.set(environments);
         if (environments.length === 0) {
           this.selectedEnvironmentId.set(null);
+          this.loadVerificationRuns(customerId, null);
+          this.loadDivergences(customerId, null);
+          this.loadLegacyNotifications(customerId, null);
           this.loading.set(false);
           return;
         }
         this.selectedEnvironmentId.set(environments[0].id);
+        this.loadVerificationRuns(customerId, environments[0].id);
+        this.loadDivergences(customerId, environments[0].id);
+        this.loadLegacyNotifications(customerId, environments[0].id);
         this.loading.set(false);
       },
       error: () => {
@@ -471,7 +530,7 @@ export class DashboardComponent implements OnInit {
         ) {
           this.selectedCustomizationVersionId.set(versions[0].id);
         }
-        this.loadVerificationRuns();
+        this.loadVerificationRuns(this.selectedCustomerId(), this.selectedEnvironmentId());
         this.loading.set(false);
       },
       error: () => {
@@ -481,13 +540,35 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  private loadVerificationRuns(): void {
-    this.customerService.listVerificationRuns().subscribe({
+  private loadVerificationRuns(customerId?: string | null, environmentId?: string | null): void {
+    this.customerService.listVerificationRuns(customerId ?? undefined, environmentId ?? undefined).subscribe({
       next: (verificationRuns) => {
         this.verificationRuns.set(verificationRuns);
       },
       error: () => {
         this.errorMessage.set('Nao foi possivel carregar o historico de verificacoes.');
+      },
+    });
+  }
+
+  private loadDivergences(customerId?: string | null, environmentId?: string | null): void {
+    this.customerService.listDivergences(customerId ?? undefined, environmentId ?? undefined).subscribe({
+      next: (divergences) => {
+        this.divergences.set(divergences);
+      },
+      error: () => {
+        this.errorMessage.set('Nao foi possivel carregar as divergencias.');
+      },
+    });
+  }
+
+  private loadLegacyNotifications(customerId?: string | null, environmentId?: string | null): void {
+    this.customerService.listLegacyNotifications(customerId ?? undefined, environmentId ?? undefined).subscribe({
+      next: (legacyNotifications) => {
+        this.legacyNotifications.set(legacyNotifications);
+      },
+      error: () => {
+        this.errorMessage.set('Nao foi possivel carregar as notificacoes ao legado.');
       },
     });
   }

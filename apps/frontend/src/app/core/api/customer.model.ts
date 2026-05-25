@@ -137,3 +137,44 @@ export interface CreateVerificationRunRequest {
   requestedBy?: string;
   correlationId?: string;
 }
+
+export type DivergenceSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type DivergenceStatus = 'OPEN' | 'NOTIFIED' | 'ACKNOWLEDGED' | 'RESOLVED' | 'IGNORED_WITH_JUSTIFICATION';
+
+export interface Divergence {
+  id: string;
+  verificationResultId: string;
+  customerId: string;
+  environmentId: string;
+  customizationId: string;
+  severity: DivergenceSeverity;
+  status: DivergenceStatus;
+  detectedAt: string;
+  resolvedAt: string | null;
+  correlationId: string | null;
+}
+
+export interface UpdateDivergenceStatusRequest {
+  status: DivergenceStatus;
+}
+
+export type LegacyNotificationStatus = 'PENDING' | 'SENT' | 'FAILED';
+export type LegacyNotificationType = 'DIVERGENCE_DETECTED';
+
+export interface LegacyNotification {
+  id: string;
+  divergenceId: string;
+  customerId: string;
+  environmentId: string;
+  customizationId: string;
+  type: LegacyNotificationType;
+  status: LegacyNotificationStatus;
+  payloadJson: string;
+  idempotencyKey: string;
+  attempts: number;
+  createdAt: string;
+  lastAttemptAt: string | null;
+  sentAt: string | null;
+  lastError: string | null;
+  correlationId: string | null;
+}
