@@ -25,10 +25,10 @@ Antes de criar endpoints, e obrigatorio definir:
 
 ## Stack Considerada Para Contratos
 
-- Backend: Java 17 com Spring Boot estavel.
+- Backend: Java 21 com Spring Boot 4 estavel.
 - Banco: PostgreSQL.
 - Frontend: Angular.
-- Especificacao: OpenAPI 3.1 quando houver API REST.
+- Especificacao: OpenAPI 3.1 com Swagger UI quando houver API REST.
 
 ## Padrao Esperado Futuro
 

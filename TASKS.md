@@ -18,9 +18,11 @@ Nao ha codigo de aplicacao, manifesto de dependencias, infraestrutura, testes ou
 
 ## Premissas Atualizadas
 
-- Backend obrigatorio: Java 17 com Spring Boot estavel compativel.
+- Backend obrigatorio: Java 21 com Spring Boot 4 estavel.
 - Banco de dados obrigatorio: PostgreSQL.
 - Frontend obrigatorio: Angular em versao estavel e suportada.
+- Documentacao de API obrigatoria: OpenAPI 3.1 com Swagger UI.
+- Lombok permitido no backend com uso controlado.
 - Arquitetura final: somente apos envio e analise do escopo detalhado do problema.
 - O objetivo da equipe e solucionar problemas com engenharia, nao apenas escrever codigo.
 
@@ -34,7 +36,7 @@ Status: Concluida.
 - [x] Ler `agents.yml`.
 - [x] Analisar workspace.
 - [x] Gerar planejamento inicial.
-- [x] Ajustar stack obrigatoria para Java 17, Spring Boot, PostgreSQL e Angular.
+- [x] Ajustar stack obrigatoria para Java 21, Spring Boot 4, PostgreSQL e Angular.
 - [x] Registrar que a arquitetura final depende do escopo detalhado do problema.
 - [x] Configurar Docker Agent oficial a partir de `agents.yml`.
 - [x] Definir `coordinator` como orquestrador principal.
@@ -135,7 +137,7 @@ Responsaveis: `backend_dev`, `frontend_dev`, `qa`, validacao do `coordinator`.
 Status: Bloqueada por Etapa 3.
 
 - [ ] Definir organizacao final do repositorio conforme arquitetura aprovada.
-- [ ] Criar backend Spring Boot com Java 17.
+- [ ] Criar backend Spring Boot 4 com Java 21.
 - [ ] Configurar Maven ou Gradle.
 - [ ] Configurar PostgreSQL local com Docker Compose.
 - [ ] Configurar migracoes com Flyway ou Liquibase.
@@ -295,10 +297,12 @@ Status: Pendente.
 
 Criterios de aceite:
 
-- [ ] Java 17 confirmado.
-- [ ] Spring Boot estavel confirmado.
+- [ ] Java 21 confirmado.
+- [ ] Spring Boot 4 estavel confirmado.
 - [ ] PostgreSQL confirmado.
 - [ ] Angular estavel confirmado.
+- [ ] OpenAPI 3.1 com Swagger UI confirmado.
+- [ ] Lombok validado para uso controlado no backend.
 - [ ] Arquitetura final mantida como pendente ate o escopo.
 - [x] Docker Agent oficial validado localmente para configuracao e toolsets.
 - [ ] `OPENAI_API_KEY` configurada no ambiente local.
@@ -397,7 +401,7 @@ Status: Bloqueada por TASK-004.
 
 Criterios de aceite:
 
-- [ ] Backend Spring Boot criado.
+- [ ] Backend Spring Boot 4 criado.
 - [ ] Frontend Angular criado.
 - [ ] PostgreSQL local configurado.
 - [ ] Comandos de build, lint e testes disponiveis.

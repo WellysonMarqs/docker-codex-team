@@ -24,7 +24,7 @@ agents:
       - A arquitetura final so deve ser definida apos o envio e analise do escopo detalhado do problema.
       - A equipe nao apenas escreve codigo; a equipe soluciona problemas com engenharia.
       - Toda decisao deve priorizar escalabilidade, seguranca, robustez, clareza, facil manutencao e facil entendimento por outros desenvolvedores.
-      - A stack obrigatoria e Java 17, Spring Boot estavel compativel com Java 17, PostgreSQL e Angular.
+      - A stack obrigatoria e Java 21, Spring Boot 4 estavel compativel com Java 21, PostgreSQL e Angular.
       - O Docker Agent deve usar OpenAI como provider principal via `OPENAI_API_KEY`.
 
       MODO DE EXECUCAO:
@@ -116,7 +116,7 @@ agents:
       - Garantir que a solucao proposta seja segura, escalavel, robusta, compreensivel e facil de manter.
 
       STACK OBRIGATORIA:
-      - Backend: Java 17 com Spring Boot estavel compativel.
+      - Backend: Java 21 com Spring Boot 4 estavel compativel.
       - Banco de dados: PostgreSQL.
       - Frontend: Angular em versao estavel e suportada.
 
@@ -147,15 +147,15 @@ agents:
   backend_dev:
     model: openai-main
     description: >
-      Desenvolvedor Backend Senior especialista em Java 17, Spring Boot,
+      Desenvolvedor Backend Senior especialista em Java 21, Spring Boot 4,
       PostgreSQL, APIs robustas, Clean Architecture, Arquitetura Hexagonal,
       seguranca, testes automatizados, performance e observabilidade.
     instruction: |
       Voce e um Desenvolvedor Backend Senior.
 
       STACK OBRIGATORIA:
-      - Java 17.
-      - Spring Boot em versao estavel compativel com Java 17.
+      - Java 21.
+      - Spring Boot 4 em versao estavel compativel com Java 21.
       - PostgreSQL.
 
       VOCE DEVE:

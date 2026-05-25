@@ -29,18 +29,18 @@ Alternativas descartadas:
 - Definir arquitetura completa agora: descartada por ausencia de escopo.
 - Criar scaffold generico: descartado por risco de induzir decisoes erradas.
 
-## ADR-002: Backend obrigatorio em Java 17 com Spring Boot estavel
+## ADR-002: Backend obrigatorio em Java 21 com Spring Boot 4 estavel
 
 Status: Aceita.
 
 Decisao:
-O backend sera construido com Java 17 e Spring Boot em uma versao estavel compativel com Java 17.
+O backend sera construido com Java 21 e Spring Boot 4 em uma versao estavel compativel com Java 21.
 
 Versao sugerida para planejamento atual:
-Spring Boot 3.5.x estavel.
+Spring Boot 4.0.x estavel.
 
 Motivo:
-Java 17 e uma base madura para backend corporativo. Spring Boot oferece ecossistema consolidado para APIs, seguranca, persistencia, validacao, testes, configuracao, observabilidade e operacao em producao.
+Java 21 oferece uma base LTS mais atual para backend corporativo. Spring Boot 4 oferece um baseline moderno para APIs, seguranca, persistencia, validacao, testes, configuracao, observabilidade e operacao em producao.
 
 Beneficios:
 - ecossistema maduro;
@@ -53,12 +53,61 @@ Beneficios:
 Trade-offs:
 - mais configuracao e disciplina arquitetural que stacks minimalistas;
 - exige cuidado para nao acoplar regra de negocio ao framework;
-- Spring Boot 4.x deve ser avaliado com cautela por compatibilidade de bibliotecas.
+- Spring Boot 4.x exige validacao cuidadosa de compatibilidade de bibliotecas e starters.
 
 Alternativas descartadas:
 - Node.js/Fastify: descartado por decisao de stack do projeto.
 - Python: descartado por decisao de stack do projeto.
 - Go: descartado por decisao de stack do projeto.
+
+## ADR-002A: Documentacao de API com OpenAPI e Swagger UI
+
+Status: Aceita.
+
+Decisao:
+Toda API HTTP do backend deve expor contrato OpenAPI 3.1 e interface Swagger UI para exploracao e validacao do contrato.
+
+Motivo:
+O projeto exige contratos claros entre backend, frontend e testes. OpenAPI fornece especificacao versionavel, enquanto Swagger UI acelera validacao tecnica, onboarding e testes exploratorios.
+
+Beneficios:
+- contrato claro entre backend e frontend;
+- melhor base para testes de contrato;
+- melhor comunicacao tecnica;
+- exploracao rapida dos endpoints;
+- suporte a automacao futura.
+
+Trade-offs:
+- exige manter anotacoes e contrato sincronizados com o codigo;
+- pode induzir descuido se a especificacao nao fizer parte do fluxo de revisao.
+
+Alternativas descartadas:
+- Documentar endpoints apenas em markdown: descartado por baixa auditabilidade.
+- Deixar contrato surgir implicitamente do codigo: descartado por fragilidade de integracao.
+
+## ADR-002B: Uso controlado de Lombok no backend
+
+Status: Aceita.
+
+Decisao:
+Permitir Lombok no backend para reduzir boilerplate tecnico, desde que ele nao esconda regras de negocio relevantes nem dificulte legibilidade e depuracao.
+
+Motivo:
+Parte significativa do backend Spring tende a repetir getters, builders, constructors e infraestrutura de DTOs. Lombok reduz ruído estrutural e melhora foco na modelagem e nos casos de uso.
+
+Beneficios:
+- menos boilerplate;
+- codigo mais enxuto em DTOs e configuracoes;
+- menor custo de manutencao mecanica.
+
+Trade-offs:
+- adiciona dependencia de annotation processing;
+- exige disciplina para nao mascarar complexidade de dominio;
+- pode dificultar onboarding em times que nao usam Lombok.
+
+Alternativas descartadas:
+- Proibir Lombok totalmente: descartado por custo de boilerplate.
+- Usar Lombok sem restricao: descartado por risco de esconder logica importante.
 
 ## ADR-003: Banco de dados obrigatorio PostgreSQL
 

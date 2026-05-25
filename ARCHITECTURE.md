@@ -29,22 +29,24 @@ Antes desse escopo, este documento deve conter apenas diretrizes, stack obrigato
 
 ### 3.1 Backend
 
-- Java 17.
-- Spring Boot em versao estavel compativel com Java 17.
+- Java 21.
+- Spring Boot 4 em versao estavel compativel com Java 21.
 - Spring Web ou Spring WebFlux somente apos analise do problema.
 - Spring Validation.
 - Spring Security quando houver autenticacao, autorizacao ou protecao de endpoints.
 - Spring Data JPA ou alternativa de persistencia definida apos o escopo.
+- Springdoc OpenAPI com Swagger UI para documentacao e exploracao da API.
+- Lombok permitido para reduzir boilerplate tecnico em DTOs, configuracoes e modelos auxiliares, sem esconder regras de negocio relevantes.
 - Flyway ou Liquibase para migracoes de banco.
 - JUnit 5, Mockito, AssertJ e Testcontainers.
 - Maven ou Gradle, a definir antes do scaffold.
 
 Versao sugerida no planejamento atual:
 
-- Spring Boot 3.5.x estavel para Java 17.
+- Spring Boot 4.0.x estavel para Java 21.
 
 Observacao:
-Spring Boot 4.x tambem exige Java 17, mas a escolha entre 3.5.x e 4.x deve considerar maturidade de bibliotecas, compatibilidade do ecossistema e risco de adocao no momento do scaffold.
+Spring Boot 4 exige validacao cuidadosa de compatibilidade do ecossistema no momento do scaffold, especialmente para bibliotecas de seguranca, observabilidade, persistencia e geracao de clientes.
 
 ### 3.2 Banco de dados
 
