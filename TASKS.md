@@ -731,6 +731,9 @@ Backend `mvn verify`; frontend lint/build; validacao HTTP real contra stack Dock
 Documentacao:
 Atualizar `README.md`, `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` e `API_CONTRACT.md`.
 
+Observacao de andamento em 2026-05-25:
+o dashboard Angular foi reorganizado com menu lateral por etapas e contexto persistente para corrigir a quebra de layout causada pela concentracao de formularios e listagens em uma unica pagina larga.
+
 ### TASK-006: Refinar estrategia de hashing e canonicalizacao SQL
 
 Responsavel: `architect`.
@@ -788,6 +791,12 @@ Escopo:
 - Definir requisitos de rede, credenciais, TLS/VPN/allowlist e timeouts.
 - Definir estrategia para clientes on-premise sem inbound.
 - Definir responsabilidades do agente local candidato.
+
+Esclarecimento ja consolidado na documentacao atual:
+- `CENTRAL_PULL` = o sistema central inicia a coleta.
+- `LOCAL_AGENT_PUSH` = o agente local inicia o envio.
+- `MANUAL_SIGNATURE_UPLOAD` = a evidencia entra manualmente de forma auditavel.
+- no scaffold atual, esses modos ja sao persistidos no ambiente, mas ainda nao acionam coletores automaticos distintos.
 - Definir limites de retry e tratamento de falhas.
 
 Fora de escopo:

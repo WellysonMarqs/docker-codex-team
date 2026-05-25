@@ -468,9 +468,24 @@ Autorizacao:
 - Perfil padrao: exige autoridade `SCOPE_customizations:read`.
 - Perfil `local`: liberado apenas para desenvolvimento Docker local.
 
+Semantica de `collectionMode` no recurso de ambiente:
+
+- `CENTRAL_PULL`: o sistema central sera o responsavel por iniciar a coleta quando o coletor automatico existir.
+- `LOCAL_AGENT_PUSH`: um agente local no ambiente do cliente sera o responsavel por iniciar o envio da evidencia quando o contrato do agente for implementado.
+- `MANUAL_SIGNATURE_UPLOAD`: o ambiente admite fluxo manual auditavel, sem coletor automatico.
+
+Observacao de UX:
+o frontend foi reorganizado com menu lateral por etapas dentro da mesma rota para reduzir densidade horizontal, sem alterar payloads, recursos ou semantica REST.
+
 ### POST /api/v1/verification-runs
 
 Cria uma verificacao manual auditavel comparando o hash informado manualmente com o hash oficial da versao selecionada. Nesta etapa nao ha coleta MySQL nem canonicalizacao automatica.
+
+Relacao com `collectionMode` nesta fase:
+
+- o endpoint nao executa `CENTRAL_PULL`;
+- o endpoint nao recebe eventos de `LOCAL_AGENT_PUSH`;
+- o endpoint representa o fluxo manual que mais se aproxima de `MANUAL_SIGNATURE_UPLOAD`, embora ainda aceite ambientes cadastrados com qualquer modo de coleta.
 
 Request:
 

@@ -655,6 +655,15 @@ Alternativas avaliadas:
 - Implementar coletor MySQL agora: descartada por depender de TASK-006 e TASK-007.
 - Abrir divergencia automatica ja nesta fase: descartada porque ainda faltam regras de severidade, lifecycle e notificacao ao legado.
 
+Esclarecimento adicional:
+os modos de coleta persistidos em `CustomerEnvironment` representam uma decisao operacional futura do ambiente, nao um comportamento automatico ja implementado. Hoje:
+- `CENTRAL_PULL` significa que o sistema central devera iniciar a coleta em fase futura.
+- `LOCAL_AGENT_PUSH` significa que um agente local devera iniciar o envio em fase futura.
+- `MANUAL_SIGNATURE_UPLOAD` significa contingencia manual auditavel e e o modo conceitualmente mais proximo do fluxo por hash manual ja entregue.
+
+Decisao adicional de UX:
+o dashboard Angular permanece em rota unica, mas a operacao foi segmentada por etapas com menu lateral e contexto persistente para evitar a quebra de layout em telas de 16 polegadas ou menores e reduzir a competicao horizontal entre formularios e tabelas.
+
 ## ADR-026: Verificacao manual persiste um resultado por execucao nesta fase
 
 Status: Aceita.

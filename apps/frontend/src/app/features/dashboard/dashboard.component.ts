@@ -1,5 +1,5 @@
 import { DatePipe, NgFor, NgIf } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import {
@@ -15,6 +15,14 @@ import {
 } from '../../core/api/customer.model';
 import { CustomerService } from '../../core/api/customer.service';
 
+type WorkspaceSection = 'customers' | 'environments' | 'customizations' | 'versions' | 'verifications';
+
+interface WorkspaceTab {
+  id: WorkspaceSection;
+  label: string;
+  hint: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   imports: [DatePipe, NgFor, NgIf, ReactiveFormsModule],
@@ -27,6 +35,7 @@ export class DashboardComponent implements OnInit {
 
   protected readonly loading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
+  protected readonly activeSection = signal<WorkspaceSection>('customers');
   protected readonly customers = signal<Customer[]>([]);
   protected readonly environments = signal<CustomerEnvironment[]>([]);
   protected readonly customizations = signal<Customization[]>([]);
@@ -36,6 +45,60 @@ export class DashboardComponent implements OnInit {
   protected readonly selectedEnvironmentId = signal<string | null>(null);
   protected readonly selectedCustomizationId = signal<string | null>(null);
   protected readonly selectedCustomizationVersionId = signal<string | null>(null);
+  protected readonly tabs: WorkspaceTab[] = [
+    { id: 'customers', label: 'Clientes', hint: 'Base de governanca' },
+    { id: 'environments', label: 'Ambientes', hint: 'Contexto de coleta' },
+    { id: 'customizations', label: 'Customizacoes', hint: 'Objetos oficiais' },
+    { id: 'versions', label: 'Versoes', hint: 'Hash oficial e canon' },
+    { id: 'verifications', label: 'Verificacoes', hint: 'Historico auditavel' },
+  ];
+  protected readonly activeTab = computed(
+    () => this.tabs.find((tab) => tab.id === this.activeSection()) ?? this.tabs[0],
+  );
+  protected readonly selectedCustomer = computed(() =>
+    this.customers().find((customer) => customer.id === this.selectedCustomerId()) ?? null,
+  );
+  protected readonly selectedEnvironment = computed(() =>
+    this.environments().find((environment) => environment.id === this.selectedEnvironmentId()) ?? null,
+  );
+  protected readonly filteredCustomizations = computed(() => {
+    const customerId = this.selectedCustomerId();
+    const environmentId = this.selectedEnvironmentId();
+
+    return this.customizations().filter((customization) => {
+      if (customerId && customization.customerId !== customerId) {
+        return false;
+      }
+      if (environmentId && customization.environmentId !== environmentId) {
+        return false;
+      }
+      return true;
+    });
+  });
+  protected readonly selectedCustomization = computed(() =>
+    this.filteredCustomizations().find((customization) => customization.id === this.selectedCustomizationId()) ?? null,
+  );
+  protected readonly selectedCustomizationVersion = computed(() =>
+    this.customizationVersions().find((version) => version.id === this.selectedCustomizationVersionId()) ?? null,
+  );
+  protected readonly relevantVerificationRuns = computed(() => {
+    const customerId = this.selectedCustomerId();
+    const environmentId = this.selectedEnvironmentId();
+
+    if (!customerId && !environmentId) {
+      return this.verificationRuns();
+    }
+
+    return this.verificationRuns().filter((run) => {
+      if (customerId && run.customerId !== customerId) {
+        return false;
+      }
+      if (environmentId && run.environmentId !== environmentId) {
+        return false;
+      }
+      return true;
+    });
+  });
   protected readonly customerForm = this.formBuilder.nonNullable.group({
     name: ['', [Validators.required, Validators.maxLength(160)]],
     externalReference: ['', [Validators.maxLength(80)]],
@@ -73,6 +136,10 @@ export class DashboardComponent implements OnInit {
     this.loadVerificationRuns();
   }
 
+  protected setActiveSection(section: WorkspaceSection): void {
+    this.activeSection.set(section);
+  }
+
   protected createCustomer(): void {
     if (this.customerForm.invalid) {
       this.customerForm.markAllAsTouched();
@@ -89,9 +156,9 @@ export class DashboardComponent implements OnInit {
     }).subscribe({
       next: (customer) => {
         this.customerForm.reset();
-        this.selectedCustomerId.set(customer.id);
+        this.selectCustomer(customer.id);
+        this.setActiveSection('environments');
         this.loadCustomers();
-        this.loadEnvironments(customer.id);
       },
       error: () => {
         this.loading.set(false);
@@ -103,11 +170,17 @@ export class DashboardComponent implements OnInit {
   protected selectCustomer(customerId: string): void {
     this.selectedCustomerId.set(customerId);
     this.selectedEnvironmentId.set(null);
+    this.selectedCustomizationId.set(null);
+    this.selectedCustomizationVersionId.set(null);
+    this.customizationVersions.set([]);
     this.loadEnvironments(customerId);
   }
 
   protected selectEnvironment(environmentId: string): void {
     this.selectedEnvironmentId.set(environmentId);
+    this.selectedCustomizationId.set(null);
+    this.selectedCustomizationVersionId.set(null);
+    this.customizationVersions.set([]);
   }
 
   protected selectCustomization(customizationId: string): void {
@@ -149,6 +222,7 @@ export class DashboardComponent implements OnInit {
           collectionMode: 'CENTRAL_PULL',
           credentialReferenceId: '',
         });
+        this.setActiveSection('customizations');
         this.loadEnvironments(customerId);
       },
       error: () => {
@@ -192,6 +266,7 @@ export class DashboardComponent implements OnInit {
           objectIdentifier: '',
           createdBy: '',
         });
+        this.setActiveSection('versions');
         this.loadCustomizations();
       },
       error: () => {
@@ -234,6 +309,7 @@ export class DashboardComponent implements OnInit {
           contentSignature: '',
           registeredBy: '',
         });
+        this.setActiveSection('verifications');
         this.loadCustomizationVersions(customizationId);
       },
       error: () => {
@@ -305,6 +381,22 @@ export class DashboardComponent implements OnInit {
     return `${version.legacySystemVersion} · ${version.canonicalizationVersion}`;
   }
 
+  protected isFormBlocked(section: WorkspaceSection): boolean {
+    if (section === 'environments') {
+      return !this.selectedCustomerId();
+    }
+    if (section === 'customizations') {
+      return !this.selectedCustomerId() || !this.selectedEnvironmentId();
+    }
+    if (section === 'versions') {
+      return !this.selectedCustomizationId();
+    }
+    if (section === 'verifications') {
+      return !this.selectedCustomerId() || !this.selectedEnvironmentId() || !this.selectedCustomizationVersionId();
+    }
+    return false;
+  }
+
   protected trackById(_: number, item: { id: string }): string {
     return item.id;
   }
@@ -336,9 +428,12 @@ export class DashboardComponent implements OnInit {
     this.customerService.listEnvironments(customerId).subscribe({
       next: (environments) => {
         this.environments.set(environments);
-        if (!this.selectedEnvironmentId() && environments.length > 0) {
-          this.selectedEnvironmentId.set(environments[0].id);
+        if (environments.length === 0) {
+          this.selectedEnvironmentId.set(null);
+          this.loading.set(false);
+          return;
         }
+        this.selectedEnvironmentId.set(environments[0].id);
         this.loading.set(false);
       },
       error: () => {
@@ -352,10 +447,6 @@ export class DashboardComponent implements OnInit {
     this.customerService.listCustomizations().subscribe({
       next: (customizations) => {
         this.customizations.set(customizations);
-        if (!this.selectedCustomizationId() && customizations.length > 0) {
-          this.selectCustomization(customizations[0].id);
-          return;
-        }
         this.loading.set(false);
       },
       error: () => {

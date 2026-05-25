@@ -309,6 +309,12 @@ O dominio principal e governanca de customizacoes de sistemas legados, com foco 
 - `AuditEvent`: registro de acoes administrativas e eventos relevantes.
 - `CredentialReference`: referencia segura para credenciais armazenadas em vault/secret manager, sem persistir segredo em texto claro no PostgreSQL.
 
+Semantica atual de `CustomerEnvironment.collectionMode`:
+
+- `CENTRAL_PULL`: o sistema central inicia a coleta da definicao do objeto ou da evidencia tecnica. Aplica-se a SaaS e a ambientes com conectividade controlada.
+- `LOCAL_AGENT_PUSH`: um agente local no ambiente do cliente inicia o envio da evidencia ao sistema central. Aplica-se a on-premise sem conectividade inbound segura ou com restricoes de seguranca.
+- `MANUAL_SIGNATURE_UPLOAD`: um operador autorizado informa manualmente a evidencia. Deve ser tratado como contingencia auditavel, nao como fluxo primario de automacao.
+
 ### 14.4 Bounded contexts candidatos
 
 - Cadastro e Governanca de Customizacoes: clientes, ambientes, objetos customizados, versoes oficiais e ownership.
@@ -391,11 +397,18 @@ On-premise sem conectividade direta:
 - comunicacao deve ser outbound do cliente para o sistema central, com autenticacao forte, rotacao de credenciais e correlation id;
 - o sistema central nao deve depender de acesso inbound ao banco do cliente.
 
+Definicao operacional resumida:
+
+- `CENTRAL_PULL`: pull significa que o sistema central abre a sessao de coleta e puxa os dados necessarios.
+- `LOCAL_AGENT_PUSH`: push significa que o agente local abre a comunicacao e empurra a evidencia para o sistema central.
+- `MANUAL_SIGNATURE_UPLOAD`: nao existe coleta automatica; a evidencia entra por acao humana auditavel.
+
 Estado atual do scaffold:
 
 - a vertical de verificacao manual auditavel ja existe no backend;
 - o operador informa `currentHash` manualmente e o sistema compara esse valor com o `officialHash` da `CustomizationVersion`;
 - `VerificationRun` e `VerificationResult` sao persistidos no PostgreSQL com `correlationId`, timestamps e status;
+- os modos `CENTRAL_PULL`, `LOCAL_AGENT_PUSH` e `MANUAL_SIGNATURE_UPLOAD` ja sao persistidos no cadastro de ambiente, mas ainda nao acionam coletores automaticos distintos;
 - ainda nao existe coletor MySQL no backend;
 - ainda nao existe canonicalizacao automatica de objetos SQL;
 - ainda nao existe abertura automatica de `Divergence`, notificacao ao legado ou agente on-premise nesta vertical.
@@ -538,7 +551,7 @@ Backend implementado:
 
 Frontend implementado:
 
-- Dashboard inicial.
+- Dashboard inicial com menu lateral por etapas, mantendo rota unica e contexto selecionado visivel.
 - `CustomerService` para API REST.
 - Formulario de cadastro de cliente.
 - Tabela de listagem de clientes.

@@ -22,6 +22,12 @@ Ambientes considerados:
 - SaaS, hospedado e controlado pela empresa.
 - On-premise, instalado no ambiente do cliente.
 
+Modos de coleta atualmente modelados por ambiente:
+
+- `CENTRAL_PULL`: o sistema central inicia a coleta diretamente na fonte do cliente. Destinado a SaaS e a ambientes com conectividade controlada, credenciais restritas e allowlist.
+- `LOCAL_AGENT_PUSH`: um agente local instalado no ambiente do cliente realiza a coleta e envia a evidencia ao sistema central. Destinado a on-premise sem acesso inbound seguro ou com restricoes de rede.
+- `MANUAL_SIGNATURE_UPLOAD`: a evidencia e informada manualmente por operador autorizado. Deve existir apenas como contingencia auditavel e, no estado atual do scaffold, e o modo que mais se aproxima do fluxo manual ja implementado.
+
 Tipos de customizacao candidatos:
 
 - tabela;
@@ -53,7 +59,7 @@ O scaffold inicial implementa os primeiros fluxos verticais de governanca:
 - endpoints `POST /api/v1/customizations` e `GET /api/v1/customizations`;
 - endpoints `POST /api/v1/customizations/{customizationId}/versions` e `GET /api/v1/customizations/{customizationId}/versions`;
 - endpoints `POST /api/v1/verification-runs`, `GET /api/v1/verification-runs` e `GET /api/v1/verification-runs/{verificationRunId}`;
-- UI inicial para cadastrar/listar clientes, ambientes, customizacoes oficiais, versoes oficiais e verificacoes manuais auditaveis.
+- UI inicial com menu lateral por etapas para cadastrar/listar clientes, ambientes, customizacoes oficiais, versoes oficiais e verificacoes manuais auditaveis sem concentrar todos os formularios em uma unica grade horizontal.
 
 Subir a stack:
 
@@ -82,6 +88,9 @@ cd apps/frontend && npm run build
 
 Observacao:
 o perfil Docker do backend usa `SPRING_PROFILES_ACTIVE=local` para permitir desenvolvimento sem provedor OAuth local. O perfil padrao mantem Resource Server JWT e RBAC por escopos.
+
+Observacao sobre coleta:
+os tres modos acima ja sao persistidos no cadastro de ambiente, mas a coleta automatica MySQL ainda nao foi implementada. Hoje o sistema usa essa informacao como decisao arquitetural do ambiente e oferece apenas a verificacao manual auditavel por hash.
 
 ## Proximo Passo
 
