@@ -6,11 +6,8 @@ Workspace de planejamento e coordenacao multi-agent para um projeto que ainda na
 
 - Codigo de aplicacao: ainda nao iniciado.
 - Arquitetura final: pendente do escopo detalhado do problema.
-- Backend definido como stack obrigatoria: Java 21 com Spring Boot 4 estavel.
-- Banco de dados definido como stack obrigatoria: PostgreSQL.
-- Frontend definido como stack obrigatoria: Angular em versao estavel e suportada.
-- Documentacao de API obrigatoria: OpenAPI 3.1 com Swagger UI.
-- Lombok permitido no backend para reduzir boilerplate tecnico.
+- Stack tecnica final: pendente da analise do problema, requisitos e restricoes.
+- Contratos de integracao: pendentes ate existir modelagem e fronteiras aprovadas.
 
 ## Principio de Trabalho
 

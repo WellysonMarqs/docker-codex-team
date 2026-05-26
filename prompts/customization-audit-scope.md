@@ -2,87 +2,87 @@
 
 Contexto do problema:
 
-Temos um sistema legado que roda em dois tipos de ambiente:
+Temos um sistema chamado lyceum NG que roda em dois tipos de ambiente:
 
-1. SaaS, hospedado e controlado pela nossa empresa.
+1. Cloud em nuvem AWS, hospedado e controlado pela nossa empresa.
 2. On-premise, instalado no ambiente do próprio cliente.
 
-O sistema legado permite customizações em algumas telas e em funções de cálculo armazenadas no banco MySQL. Cada cliente pode ter sua própria customização.
+O lyceum NG permite customizações em algumas telas XML e em funções armazenadas no banco SQLServer. Cada cliente pode ter sua própria customização.
 
 Exemplo relevante:
-O sistema legado possui funções no banco que calculam juros e recálculo de dívidas. Cada cliente pode ter uma fórmula própria de cálculo. O processamento do valor da dívida acontece no banco de dados.
+O lyceum NG possui funções no banco que calculam juros e recálculo de dívidas. Cada cliente pode ter uma fórmula própria de cálculo. O processamento do valor da dívida acontece no banco de dados.
 
 Situação atual:
 
-- Para clientes SaaS, a equipe de suporte controla e aplica essas customizações.
-- Para clientes on-premise, o cliente precisa solicitar à equipe de suporte que aplique as customizações no banco de dados dele.
+- Para clientes Cloud AWS, a equipe de suporte/consultoria controla e aplica essas customizações.
+- Para clientes on-premise, o cliente precisa solicitar à equipe de suporte/consultoria que aplique as customizações no banco de dados dele.
 - Alguns clientes on-premise alteram as customizações por conta própria, sem solicitar suporte.
-- Essas alterações não controladas podem gerar bugs e problemas quando o sistema legado é atualizado para uma nova versão.
+- Essas alterações não controladas podem gerar bugs e problemas quando o lyceum NG é atualizado para uma nova versão.
 
 Problema a resolver:
 
-Precisamos criar um novo sistema para controlar quais customizações existem, a quais clientes pertencem e se a customização instalada no banco do cliente continua igual à versão registrada oficialmente.
+Precisamos criar um novo sistema chamado backoffice para controlar quais customizações existem, a quais clientes pertencem e se a customização instalada no banco do cliente continua igual à versão registrada oficialmente.
 
-Objetivo do novo sistema:
+Objetivo do backoffice:
 
-Criar um sistema de controle e auditoria de customizações do sistema legado, capaz de:
+Criar um sistema de controle e auditoria de customizações do lyceum NG, capaz de:
 
 - registrar customizações oficiais por cliente;
 - armazenar um hash do conteúdo da customização;
-- identificar qual tabela, função, procedure, trigger ou objeto customizado pertence a qual cliente;
+- identificar qual tabela, função, procedure, trigger, objeto customizado ou tela em xml pertence a qual cliente;
 - consultar periodicamente ou sob demanda o banco do cliente;
 - gerar um hash do conteúdo atual da customização no banco do cliente;
 - comparar o hash atual com o hash oficial registrado;
 - detectar alterações não autorizadas ou divergentes;
-- notificar o sistema legado quando houver divergência;
+- notificar o usário responsável por e-mail quando houver divergência;
 - permitir integração por API REST.
 
 Exemplo de funcionamento esperado:
 
-1. A equipe registra no novo sistema que o cliente X possui uma customização na função de cálculo de juros.
-2. O novo sistema armazena:
+1. A equipe registra no backoffice que o cliente X possui uma customização na função de cálculo de juros.
+2. O backoffice armazena:
    - cliente;
-   - ambiente: SaaS ou on-premise;
+   - ambiente: Cloud AWS ou on-premise;
    - tipo de objeto customizado;
-   - identificador do objeto, por exemplo nome da tabela, função, procedure ou trigger;
+   - identificador do objeto, por exemplo nome da tabela, função, procedure, trigger ou tela;
    - conteúdo ou assinatura da customização;
    - hash oficial da customização;
-   - versão do sistema legado relacionada;
+   - versão do lyceum NG relacionada;
    - data de registro;
    - responsável pelo registro.
-3. Periodicamente, ou quando houver atualização da tabela/função/procedure, o novo sistema consulta o banco do cliente.
-4. O sistema gera um novo hash do conteúdo encontrado.
+3. Periodicamente, ou quando houver atualização da tabela/função/procedure, o backoffice consulta o banco do cliente.
+4. O backoffice gera um novo hash do conteúdo encontrado.
 5. Se o hash atual for igual ao hash oficial, não houve alteração.
 6. Se o hash atual for diferente, houve alteração não registrada ou divergente.
-7. A divergência deve ser registrada e notificada ao sistema legado via API REST.
+7. A divergência deve ser registrada e notificada ao usuário responsável via e-mail.
 
 Requisitos funcionais iniciais:
 
 - Cadastrar clientes.
-- Cadastrar ambientes do cliente: SaaS ou on-premise.
+- Cadastrar ambientes do cliente: Cloud AWS ou on-premise.
 - Cadastrar customizações oficiais por cliente.
 - Registrar hash oficial da customização.
-- Registrar tipo de customização: tabela, função, procedure, trigger, script SQL ou outro objeto.
+- Registrar tipo de customização: tabela, função, procedure, trigger, script SQL, xml de tela ou outro objeto.
 - Consultar customizações registradas.
 - Executar verificação de integridade das customizações.
 - Comparar hash oficial com hash atual encontrado no banco do cliente.
 - Registrar histórico de verificações.
 - Registrar divergências.
-- Notificar o sistema legado via API REST quando houver divergência.
+- Notificar o responsável via e-mail quando houver divergência.
 - Permitir execução manual de verificação.
 - Permitir execução periódica/agendada de verificação.
 
 Requisitos não funcionais:
 
-- Segurança é crítica, pois o sistema pode acessar bancos de clientes.
+- Segurança é crítica, pois o backoffice pode acessar bancos de clientes.
 - Credenciais de banco dos clientes não podem ficar expostas.
 - Deve haver auditoria de ações.
 - Deve haver rastreabilidade das verificações.
 - Deve haver logs estruturados.
 - Deve ser possível entender facilmente qual cliente possui qual customização.
-- Deve ser robusto para ambientes SaaS e on-premise.
+- Deve ser robusto para ambientes Cloud AWS e on-premise.
 - Deve ser extensível para novos tipos de customização no futuro.
-- Deve evitar acoplamento forte com detalhes internos do legado.
+- Deve evitar acoplamento forte com detalhes internos do lyceum NG.
 - Deve considerar performance, pois alguns clientes podem ter muitas customizações.
 - Deve considerar falhas de conexão com ambientes on-premise.
 - Deve considerar retry, timeout e tratamento de erro.
@@ -90,11 +90,11 @@ Requisitos não funcionais:
 
 Stack obrigatória:
 
-- Backend: Java 17 com Spring Boot estável.
-- Banco do novo sistema: PostgreSQL.
+- Backend: Java 21 com Spring Boot 4 estável.
+- Banco do backoffice: SQLServer.
 - Frontend: Angular.
-- Sistema legado: usa MySQL.
-- Integração de notificação: API REST.
+- lyceum NG: usa SQLServer.
+- Integração de notificação: E-mail.
 
 Restrições importantes:
 
@@ -121,8 +121,8 @@ Tarefas esperadas do multi-agent neste momento:
    - explicar trade-offs;
    - sugerir modelo inicial de dados;
    - sugerir estratégia de hashing;
-   - sugerir estratégia de coleta/verificação em ambientes SaaS e on-premise;
-   - sugerir estratégia de notificação via API REST;
+   - sugerir estratégia de coleta/verificação em ambientes Cloud AWS e on-premise;
+   - sugerir estratégia de notificação via e-mail;
    - sugerir estratégia de segurança para credenciais e acesso aos bancos dos clientes;
    - sugerir estratégia de auditoria e observabilidade.
 3. O coordinator deve validar a proposta do architect.
@@ -131,16 +131,16 @@ Tarefas esperadas do multi-agent neste momento:
 
 Perguntas que o multi-agent deve responder:
 
-- Qual é o domínio principal do sistema?
+- Qual é o domínio principal do backoffice?
 - Quais entidades iniciais parecem necessárias?
 - Como representar cliente, ambiente, customização, hash oficial, verificação e divergência?
 - Como calcular hash de forma determinística para objetos SQL?
 - Como evitar falsos positivos por diferença de formatação SQL?
-- Como acessar bancos MySQL de clientes on-premise com segurança?
-- O sistema deve puxar dados dos clientes ou os clientes devem enviar dados?
+- Como acessar bancos SqlServer de clientes on-premise com segurança?
+- O backoffice deve puxar dados dos clientes ou os clientes devem enviar dados?
 - Como lidar com clientes on-premise sem acesso direto de rede?
-- Como versionar customizações por versão do legado?
-- Como notificar o legado via REST?
+- Como versionar customizações por versão do sistema lyceum NG?
+- Como notificar o usuário responsavel via e-mail?
 - Quais riscos existem?
 - Quais decisões precisam ser registradas em DECISIONS.md?
 - Quais tarefas devem ser criadas em TASKS.md?

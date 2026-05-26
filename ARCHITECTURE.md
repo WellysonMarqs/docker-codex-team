@@ -23,62 +23,29 @@ Nenhuma arquitetura definitiva deve ser implementada ou tratada como final antes
 - necessidades de integracao;
 - criterios de sucesso.
 
-Antes desse escopo, este documento deve conter apenas diretrizes, stack obrigatoria, criterios de decisao e um processo para chegar a arquitetura correta.
+Antes desse escopo, este documento deve conter apenas diretrizes, criterios de decisao e um processo para chegar a arquitetura correta.
 
-## 3. Stack Obrigatoria
+## 3. Diretrizes Tecnicas Iniciais
 
-### 3.1 Backend
+Tecnologias, frameworks, banco de dados, bibliotecas e ferramentas de suporte nao devem ser definidos como obrigatorios antes da analise do problema.
 
-- Java 21.
-- Spring Boot 4 em versao estavel compativel com Java 21.
-- Spring Web ou Spring WebFlux somente apos analise do problema.
-- Spring Validation.
-- Spring Security quando houver autenticacao, autorizacao ou protecao de endpoints.
-- Spring Data JPA ou alternativa de persistencia definida apos o escopo.
-- Springdoc OpenAPI com Swagger UI para documentacao e exploracao da API.
-- Lombok permitido para reduzir boilerplate tecnico em DTOs, configuracoes e modelos auxiliares, sem esconder regras de negocio relevantes.
-- Flyway ou Liquibase para migracoes de banco.
-- JUnit 5, Mockito, AssertJ e Testcontainers.
-- Maven ou Gradle, a definir antes do scaffold.
+Ainda assim, qualquer stack escolhida futuramente deve atender aos seguintes criterios:
 
-Versao sugerida no planejamento atual:
+- aderencia ao dominio e aos fluxos principais;
+- suporte adequado a seguranca, observabilidade e testes automatizados;
+- facilidade de manutencao e onboarding;
+- compatibilidade com os requisitos de integracao;
+- maturidade operacional e ecossistema suficiente para o problema;
+- capacidade de evolucao sem acoplamento desnecessario;
+- custo operacional coerente com a necessidade real do produto.
 
-- Spring Boot 4.0.x estavel para Java 21.
+Quando a arquitetura for aprovada, este documento devera registrar:
 
-Observacao:
-Spring Boot 4 exige validacao cuidadosa de compatibilidade do ecossistema no momento do scaffold, especialmente para bibliotecas de seguranca, observabilidade, persistencia e geracao de clientes.
-
-### 3.2 Banco de dados
-
-- PostgreSQL.
-- Migracoes versionadas.
-- Indices definidos por padrao de consulta real.
-- Transacoes explicitas para casos de uso criticos.
-- Testes de integracao com banco real via Testcontainers.
-
-### 3.3 Frontend
-
-- Angular em versao estavel e suportada oficialmente.
-- Angular CLI na mesma versao principal do Angular.
-- TypeScript conforme matriz oficial de compatibilidade do Angular.
-- RxJS conforme matriz oficial de compatibilidade do Angular.
-- Angular Router.
-- Reactive Forms.
-- Angular HttpClient.
-- Testes com Jasmine/Karma ou Vitest quando tecnicamente justificavel.
-- Testes E2E com Playwright.
-
-Versao sugerida no planejamento atual:
-
-- Angular 21.x para projetos novos, se o ecossistema de dependencias do projeto estiver compativel.
-- Angular 20.x LTS pode ser escolhido se a prioridade for maior estabilidade de bibliotecas e suporte de longo prazo.
-
-### 3.4 Infraestrutura e contratos
-
-- Docker Compose para ambiente local.
-- OpenAPI 3.1 para contratos REST quando houver API HTTP.
-- CI/CD com validacao obrigatoria de lint, build e testes.
-- Observabilidade com logs estruturados, health checks, metricas e tracing quando aplicavel.
+- stack backend escolhida e justificativa;
+- stack frontend escolhida e justificativa;
+- estrategia de persistencia e justificativa;
+- estrategia de contratos e integracoes;
+- estrategia de ambiente local, build, testes e entrega.
 
 ## 4. Workflow Multi-Agent Profissional
 
@@ -86,9 +53,9 @@ Versao sugerida no planejamento atual:
 
 - `root`: coordena o fluxo, valida qualidade, integra entregas, bloqueia decisoes frageis e garante documentacao.
 - `architect`: analisa o problema, modela dominio, avalia trade-offs e propoe arquitetura apos receber o escopo.
-- `backend_dev`: implementa backend somente apos aprovacao da arquitetura e dos contratos.
-- `frontend_dev`: implementa frontend somente apos aprovacao da estrategia de UX, arquitetura frontend e contratos.
-- `qa`: define estrategia, executa validacoes e aprova os testes obrigatorios do projeto.
+- `backend_dev`: implementa backend somente apos aprovacao da arquitetura, da stack e dos contratos.
+- `frontend_dev`: implementa frontend somente apos aprovacao da estrategia de UX, arquitetura frontend, stack e contratos.
+- `qa`: define estrategia, implementa e executa a frente de testes, registra evidencias, reporta defeitos e emite parecer objetivo sobre quality gates.
 
 ### 4.2 Docker Agent Oficial
 
@@ -134,7 +101,7 @@ Docker Agent
 6. `architect` atualiza `ARCHITECTURE.md` com a arquitetura aprovada.
 7. Contratos sao definidos em `API_CONTRACT.md` quando houver integracao.
 8. `backend_dev` e `frontend_dev` implementam apenas tarefas aprovadas em `TASKS.md`.
-9. `qa` executa a estrategia de testes, valida quality gates e reporta falhas ou lacunas.
+9. `qa` executa a estrategia de testes, valida quality gates, registra evidencias, reporta falhas ou lacunas e emite parecer objetivo sobre a entrega.
 10. `coordinator` valida integracao, lint, build, testes e documentacao.
 
 ## 5. Criterios Para Definir a Arquitetura
@@ -158,6 +125,7 @@ Criticos:
 Perguntas obrigatorias antes da decisao:
 
 - O problema exige modular monolith, monolito simples, arquitetura hexagonal completa ou servicos separados?
+- Quais tecnologias atendem melhor aos requisitos sem antecipar complexidade?
 - O dominio possui bounded contexts reais ou ainda nao?
 - Ha necessidade de processamento assincrono?
 - Ha necessidade de auditoria?
@@ -177,7 +145,7 @@ A arquitetura backend sera definida apos o escopo. Ainda assim, qualquer backend
 - transacoes controladas;
 - logs estruturados;
 - testes unitarios e de integracao;
-- migracoes de banco versionadas;
+- migracoes de banco versionadas quando houver persistencia relacional;
 - configuracao externa por ambiente;
 - protecao contra vazamento de dados sensiveis.
 
@@ -196,12 +164,12 @@ Esses padroes so devem ser usados quando resolverem um problema real de design.
 
 ## 7. Diretrizes de Frontend
 
-A arquitetura frontend sera definida apos o escopo. Ainda assim, qualquer frontend Angular deve respeitar:
+A arquitetura frontend sera definida apos o escopo. Ainda assim, qualquer frontend escolhido deve respeitar:
 
 - organizacao por funcionalidades quando o dominio justificar;
 - componentes pequenos e reutilizaveis;
 - separacao entre componentes de apresentacao, servicos e estado;
-- formularios reativos para fluxos com validacao relevante;
+- estrategia consistente de formularios e validacao para fluxos relevantes;
 - acessibilidade desde o inicio;
 - responsividade;
 - tratamento padronizado de loading, empty, error e success states;
@@ -235,12 +203,27 @@ Principios:
 Estrategia minima esperada quando houver codigo:
 
 - Backend unitario: dominio, services, use cases, validators e mappers.
-- Backend integracao: repositories, controllers, seguranca, banco PostgreSQL com Testcontainers.
+- Backend integracao: repositories, controllers, seguranca e persistencia realista para o ambiente escolhido.
 - Frontend unitario: componentes, services, pipes, guards e validators.
-- Frontend integracao: fluxos com HttpClient mocks e componentes conectados.
-- Contrato: compatibilidade entre OpenAPI, backend e cliente frontend.
+- Frontend integracao: fluxos com mocks, stubs ou ambientes de teste aderentes a arquitetura escolhida.
+- Contrato: compatibilidade entre os contratos de integracao aprovados e os componentes consumidores.
 - E2E: fluxos criticos com Playwright.
 - Acessibilidade: validacao automatizada nos fluxos principais.
+
+Entregaveis minimos esperados do QA:
+
+- estrategia ou plano de testes atualizado por entrega, feature ou sprint;
+- matriz resumida relacionando fluxo ou requisito, tipo de teste e status;
+- evidencias objetivas de execucao, como comandos, logs, CI, screenshots ou registros reproduziveis;
+- defeitos registrados com passos, esperado versus atual, severidade e evidencia;
+- parecer final no formato aprovado, aprovado com ressalvas ou bloqueado.
+
+Quando nao houver codigo, ambiente ou dados disponiveis, o QA deve produzir:
+
+- plano de testes;
+- premissas e dependencias;
+- riscos;
+- criterios de pronto para teste.
 
 ## 10. CI/CD
 
@@ -263,7 +246,7 @@ Pipeline minimo quando houver codigo:
 Diretrizes obrigatorias:
 
 - validar toda entrada;
-- usar Spring Security quando houver endpoints protegidos;
+- usar mecanismo de autenticacao e autorizacao compativel com a arquitetura aprovada quando houver endpoints protegidos;
 - aplicar autorizacao no backend, nao apenas no frontend;
 - evitar exposicao de stack traces;
 - proteger secrets por variaveis de ambiente ou secret manager;

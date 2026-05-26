@@ -8,7 +8,7 @@ Nenhum contrato de API deve ser definido antes do envio e analise do escopo deta
 
 ## Regra
 
-Os contratos devem ser derivados do dominio, dos fluxos reais do produto e das necessidades de integracao entre Angular e Spring Boot.
+Os contratos devem ser derivados do dominio, dos fluxos reais do produto e das necessidades de integracao entre os componentes da solucao aprovada.
 
 Antes de criar endpoints, e obrigatorio definir:
 
@@ -23,12 +23,11 @@ Antes de criar endpoints, e obrigatorio definir:
 - requisitos nao funcionais;
 - criterios de aceite.
 
-## Stack Considerada Para Contratos
+## Consideracoes Para Contratos
 
-- Backend: Java 21 com Spring Boot 4 estavel.
-- Banco: PostgreSQL.
-- Frontend: Angular.
-- Especificacao: OpenAPI 3.1 com Swagger UI quando houver API REST.
+- O estilo de contrato depende da arquitetura aprovada e do tipo de integracao necessario.
+- Quando houver API HTTP, o padrao de especificacao e a forma de exploracao devem ser definidos junto com a estrategia de testes e versionamento.
+- Quando houver mensageria, jobs ou integracoes assincronas, os contratos tambem devem explicitar payloads, eventos, idempotencia e tratamento de falhas.
 
 ## Padrao Esperado Futuro
 

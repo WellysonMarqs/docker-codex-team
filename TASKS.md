@@ -2,7 +2,7 @@
 
 ## Estado Atual
 
-Workspace analisado em 2026-05-23.
+Workspace analisado em 2026-05-26.
 
 Arquivos encontrados:
 
@@ -14,16 +14,13 @@ Arquivos encontrados:
 - `TASKS.md`
 - `API_CONTRACT.md`
 
-Nao ha codigo de aplicacao, manifesto de dependencias, infraestrutura, testes ou repositorio Git inicializado neste workspace.
+Nao ha codigo de aplicacao, manifesto de dependencias, infraestrutura executavel ou suites de teste implementadas neste workspace.
 
 ## Premissas Atualizadas
 
-- Backend obrigatorio: Java 21 com Spring Boot 4 estavel.
-- Banco de dados obrigatorio: PostgreSQL.
-- Frontend obrigatorio: Angular em versao estavel e suportada.
-- Documentacao de API obrigatoria: OpenAPI 3.1 com Swagger UI.
-- Lombok permitido no backend com uso controlado.
 - Arquitetura final: somente apos envio e analise do escopo detalhado do problema.
+- Stack tecnica final: somente apos analise arquitetural e validacao do coordinator.
+- Contratos e integracoes: somente apos modelagem inicial do dominio.
 - O objetivo da equipe e solucionar problemas com engenharia, nao apenas escrever codigo.
 
 ## Workflow Multi-Agent
@@ -36,7 +33,7 @@ Status: Concluida.
 - [x] Ler `agents.yml`.
 - [x] Analisar workspace.
 - [x] Gerar planejamento inicial.
-- [x] Ajustar stack obrigatoria para Java 21, Spring Boot 4, PostgreSQL e Angular.
+- [x] Registrar que a stack tecnica final depende da analise do problema.
 - [x] Registrar que a arquitetura final depende do escopo detalhado do problema.
 - [x] Configurar Docker Agent oficial a partir de `agents.yml`.
 - [x] Definir `coordinator` como orquestrador principal.
@@ -118,7 +115,7 @@ Status: Bloqueada por Etapa 2.
 - [ ] Definir DTOs de request e response.
 - [ ] Definir modelo padrao de erro.
 - [ ] Definir autenticacao e autorizacao.
-- [ ] Definir estrategia de persistencia PostgreSQL.
+- [ ] Definir estrategia de persistencia.
 - [ ] Definir estrategia de migracoes.
 - [ ] Atualizar `API_CONTRACT.md`.
 - [ ] Atualizar `ARCHITECTURE.md`.
@@ -132,22 +129,21 @@ Gate de saida:
 
 ### Etapa 4: Setup do projeto
 
-Responsaveis: `backend_dev`, `frontend_dev`, `qa`, validacao do `coordinator`.
+Responsaveis: `backend_dev`, `frontend_dev` e `qa`, com validacao do `coordinator`.
 
 Status: Bloqueada por Etapa 3.
 
 - [ ] Definir organizacao final do repositorio conforme arquitetura aprovada.
-- [ ] Criar backend Spring Boot 4 com Java 21.
-- [ ] Configurar Maven ou Gradle.
-- [ ] Configurar PostgreSQL local com Docker Compose.
-- [ ] Configurar migracoes com Flyway ou Liquibase.
-- [ ] Criar frontend Angular.
-- [ ] Configurar lint backend.
-- [ ] Configurar lint frontend.
-- [ ] Configurar build backend.
-- [ ] Configurar build frontend.
-- [ ] Configurar testes backend.
-- [ ] Configurar testes frontend.
+- [ ] Criar backend na stack aprovada.
+- [ ] Configurar ferramenta de build backend aprovada.
+- [ ] Configurar persistencia local conforme arquitetura aprovada.
+- [ ] Configurar estrategia de migracoes conforme arquitetura aprovada.
+- [ ] Criar frontend na stack aprovada.
+- [ ] Preparar pontos de observabilidade e testabilidade necessarios para o qa.
+- [ ] Configurar lint backend com apoio do qa.
+- [ ] Configurar lint frontend com apoio do qa.
+- [ ] Configurar build backend com apoio do qa.
+- [ ] Configurar build frontend com apoio do qa.
 - [ ] Atualizar `README.md`.
 
 Gate de saida:
@@ -155,7 +151,7 @@ Gate de saida:
 - [ ] Backend compila.
 - [ ] Frontend compila.
 - [ ] Lint executa.
-- [ ] Testes base executam.
+- [ ] Base minima de testabilidade preparada para o qa.
 - [ ] Documentacao atualizada.
 
 ### Etapa 5: Backend
@@ -168,13 +164,12 @@ Status: Bloqueada por Etapa 4.
 - [ ] Implementar configuracao por ambiente.
 - [ ] Implementar validacao de entrada.
 - [ ] Implementar tratamento padronizado de erros.
-- [ ] Implementar persistencia PostgreSQL.
+- [ ] Implementar persistencia aprovada.
 - [ ] Implementar migracoes.
 - [ ] Implementar seguranca conforme escopo.
 - [ ] Implementar logs estruturados.
 - [ ] Implementar health checks.
-- [ ] Implementar testes unitarios.
-- [ ] Implementar testes de integracao com Testcontainers.
+- [ ] Garantir testabilidade da camada backend para o qa.
 - [ ] Atualizar `API_CONTRACT.md`.
 - [ ] Atualizar `README.md`.
 
@@ -185,6 +180,8 @@ Gate de saida:
 - [ ] Testes unitarios backend passam.
 - [ ] Testes de integracao backend passam.
 - [ ] Contratos passam.
+- [ ] Camada backend entregue com pontos de testabilidade e observabilidade necessarios para o qa.
+- [ ] Dependencias de teste do backend documentadas para o qa.
 
 ### Etapa 6: Frontend
 
@@ -192,7 +189,7 @@ Responsavel principal: `frontend_dev`.
 
 Status: Bloqueada por Etapa 4.
 
-- [ ] Implementar estrutura Angular aprovada.
+- [ ] Implementar estrutura frontend aprovada.
 - [ ] Implementar rotas.
 - [ ] Implementar componentes base.
 - [ ] Implementar formularios reativos.
@@ -202,17 +199,15 @@ Status: Bloqueada por Etapa 4.
 - [ ] Implementar estados loading, empty, error e success.
 - [ ] Implementar acessibilidade.
 - [ ] Implementar responsividade.
-- [ ] Implementar testes unitarios.
-- [ ] Implementar testes E2E com Playwright.
+- [ ] Garantir testabilidade da camada frontend para o qa.
 - [ ] Atualizar `README.md`.
 
 Gate de saida:
 
 - [ ] Build frontend passa.
 - [ ] Lint frontend passa.
-- [ ] Testes unitarios frontend passam.
-- [ ] Fluxos criticos E2E passam.
-- [ ] Validacao de acessibilidade realizada.
+- [ ] Camada frontend entregue com pontos de testabilidade e observabilidade necessarios para o qa.
+- [ ] Dependencias de teste do frontend documentadas para o qa.
 
 ### Etapa 6A: QA e Validacao
 
@@ -221,6 +216,11 @@ Responsavel principal: `qa`.
 Status: Bloqueada por Etapas 4, 5 e 6.
 
 - [ ] Definir estrategia de testes por fluxo critico.
+- [ ] Definir quality gates minimos por tipo de entrega.
+- [ ] Definir criterio de parecer final: aprovado, aprovado com ressalvas ou bloqueado.
+- [ ] Implementar suites de teste e automacoes necessarias.
+- [ ] Configurar infraestrutura de testes e dados de apoio.
+- [ ] Preparar matriz resumida por fluxo ou requisito x tipo de teste x status.
 - [ ] Validar cobertura minima de backend.
 - [ ] Validar cobertura minima de frontend.
 - [ ] Executar lint.
@@ -230,14 +230,19 @@ Status: Bloqueada por Etapas 4, 5 e 6.
 - [ ] Executar testes de contrato quando aplicavel.
 - [ ] Executar E2E nos fluxos criticos quando aplicavel.
 - [ ] Executar validacao automatizada de acessibilidade quando aplicavel.
+- [ ] Executar smoke de seguranca basica quando aplicavel.
+- [ ] Executar testes exploratorios guiados por risco quando aplicavel.
 - [ ] Registrar bugs, riscos e lacunas de cobertura.
+- [ ] Registrar evidencias objetivas de execucao.
 - [ ] Aprovar ou reprovar quality gates.
 
 Gate de saida:
 
 - [ ] Evidencias de validacao registradas.
 - [ ] Falhas criticas tratadas ou bloqueios formalizados.
-- [ ] Quality gates aprovados para integracao.
+- [ ] Parecer final emitido com status objetivo.
+- [ ] Quality gates aprovados para integracao ou bloqueio formalizado.
+- [ ] Fluxos criticos E2E passam.
 
 ### Etapa 7: CI/CD
 
@@ -267,7 +272,7 @@ Gate de saida:
 
 ### Etapa 8: Hardening
 
-Responsaveis: todos os agentes, com lideranca de `qa` na frente de testes.
+Responsaveis: todos os agentes, com `qa` como responsavel pela frente de testes.
 
 Status: Bloqueada por Etapas 5, 6 e 7.
 
@@ -276,7 +281,7 @@ Status: Bloqueada por Etapas 5, 6 e 7.
 - [ ] Revisar tratamento de erros.
 - [ ] Revisar performance backend.
 - [ ] Revisar performance frontend.
-- [ ] Revisar indices PostgreSQL.
+- [ ] Revisar estrategia de indices e consultas da persistencia aprovada.
 - [ ] Revisar acessibilidade.
 - [ ] Revisar observabilidade.
 - [ ] Revisar cobertura de testes.
@@ -297,12 +302,11 @@ Status: Pendente.
 
 Criterios de aceite:
 
-- [ ] Java 21 confirmado.
-- [ ] Spring Boot 4 estavel confirmado.
-- [ ] PostgreSQL confirmado.
-- [ ] Angular estavel confirmado.
-- [ ] OpenAPI 3.1 com Swagger UI confirmado.
-- [ ] Lombok validado para uso controlado no backend.
+- [ ] Escopo detalhado recebido e validado.
+- [ ] Stack backend aprovada quando houver arquitetura.
+- [ ] Stack frontend aprovada quando houver arquitetura.
+- [ ] Estrategia de persistencia aprovada quando houver arquitetura.
+- [ ] Estrategia de contratos aprovada quando houver arquitetura.
 - [ ] Arquitetura final mantida como pendente ate o escopo.
 - [x] Docker Agent oficial validado localmente para configuracao e toolsets.
 - [ ] `OPENAI_API_KEY` configurada no ambiente local.
@@ -317,7 +321,7 @@ Criterios de aceite:
 
 - [x] Agente `qa` definido em `agents.yml`.
 - [x] `root` pode delegar tarefas para `qa`.
-- [ ] `docker agent debug toolsets agents.yml` confirma toolsets do `qa`.
+- [x] `docker agent debug toolsets agents.yml` confirma toolsets do `qa`.
 - [x] Workflow e documentacao atualizados para incluir `qa`.
 
 ### TASK-001A: Validar Docker Agent oficial
@@ -401,9 +405,9 @@ Status: Bloqueada por TASK-004.
 
 Criterios de aceite:
 
-- [ ] Backend Spring Boot 4 criado.
-- [ ] Frontend Angular criado.
-- [ ] PostgreSQL local configurado.
+- [ ] Backend na stack aprovada criado.
+- [ ] Frontend na stack aprovada criado.
+- [ ] Persistencia local aprovada configurada.
 - [ ] Comandos de build, lint e testes disponiveis.
 - [ ] Documentacao atualizada.
 
@@ -418,6 +422,8 @@ Criterios de aceite:
 - [ ] Matriz de testes definida por fluxo critico.
 - [ ] Quality gates definidos por tipo de entrega.
 - [ ] Estrategia de evidencias de execucao definida.
+- [ ] Modelo de parecer final definido.
+- [ ] Comportamento sem ambiente ou sem codigo definido.
 - [ ] Responsabilidades entre implementacao e validacao documentadas.
 
 ## Modelo de Tarefa
