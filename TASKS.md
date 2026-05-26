@@ -332,7 +332,7 @@ Criterios de aceite:
 - [ ] `docker agent run agents.yml --dry-run` executa com sucesso com `OPENAI_API_KEY` configurada.
 - [ ] `docker agent run agents.yml` inicia o root/coordinator.
 - [x] `docker agent debug toolsets agents.yml` lista ferramentas dos agentes.
-- [ ] `docker agent build agents.yml team-agents:latest` gera a imagem do agente quando disponivel na CLI local.
+- [ ] `docker agent build agents.yml backoffice-team-agents:latest` gera a imagem do agente quando disponivel na CLI local.
 - [x] Todos os agentes usam `agents.yml` como fonte de instrucao.
 - [x] `agents.yml` usa OpenAI como provider principal.
 

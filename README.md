@@ -85,7 +85,7 @@ docker agent debug toolsets agents.yml
 Gerar uma imagem Docker do agente, quando sua versao do Docker Agent suportar o comando `build`:
 
 ```bash
-docker agent build agents.yml team-agents:latest
+docker agent build agents.yml backoffice-team-agents:latest
 ```
 
 Observacao: a CLI local validada neste workspace e `docker agent v1.57.0`; ela executa `run`, `debug config` e `debug toolsets`, mas nao expoe `build` nesta instalacao.
