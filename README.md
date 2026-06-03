@@ -24,7 +24,9 @@ Este projeto usa o Docker Agent oficial. O arquivo `agents.yml` define o time mu
 Modo de execucao escolhido:
 
 - Docker Agent usa OpenAI como provider principal via `OPENAI_API_KEY`.
-- O modelo configurado em `agents.yml` e `openai-main`, apontando para `gpt-5.4`.
+- Os aliases de modelo em `agents.yml` separam coordenacao generalista de coding agentic.
+- `openai-general` aponta para `gpt-5.4`.
+- `openai-coding` aponta para `gpt-5.2-codex`.
 - O `root` atua como `coordinator`.
 
 Pre-requisitos:

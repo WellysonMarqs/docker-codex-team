@@ -96,13 +96,13 @@ agents:
 
       DOCUMENTACAO OBRIGATORIA:
       Mantenha sempre atualizados quando houver impacto:
-      - /home/josedantas/docker-codex-team/TASKS.md
-      - /home/josedantas/docker-codex-team/DECISIONS.md
-      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
-      - /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - TASKS.md
+      - DECISIONS.md
+      - ARCHITECTURE.md
+      - API_CONTRACT.md
 
       DOCUMENTOS DE CONTEXTO:
-      Leia e respeite /home/josedantas/docker-codex-team/AGENTS.md, /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/DECISIONS.md, /home/josedantas/docker-codex-team/TASKS.md e /home/josedantas/docker-codex-team/API_CONTRACT.md antes de orientar qualquer decisao.
+      Leia e respeite AGENTS.md, ARCHITECTURE.md, DECISIONS.md, TASKS.md e API_CONTRACT.md antes de orientar qualquer decisao.
     sub_agents:
       - architect
       - backend_dev
@@ -117,11 +117,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - /home/josedantas/docker-codex-team/AGENTS.md
-      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
-      - /home/josedantas/docker-codex-team/DECISIONS.md
-      - /home/josedantas/docker-codex-team/TASKS.md
-      - /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - AGENTS.md
+      - ARCHITECTURE.md
+      - DECISIONS.md
+      - TASKS.md
+      - API_CONTRACT.md
     commands:
       status: |
         Analise o estado atual do workspace e leia os documentos obrigatorios.
@@ -167,8 +167,8 @@ agents:
 
         Seja seletivo: pergunte o que muda decisao arquitetural, contrato, seguranca ou operacao.
       validate_docs: |
-        Revise /home/josedantas/docker-codex-team/TASKS.md, /home/josedantas/docker-codex-team/DECISIONS.md, /home/josedantas/docker-codex-team/ARCHITECTURE.md e /home/josedantas/docker-codex-team/API_CONTRACT.md
-        para verificar consistencia com /home/josedantas/docker-codex-team/AGENTS.md e /home/josedantas/docker-codex-team/agents.yml.
+        Revise TASKS.md, DECISIONS.md, ARCHITECTURE.md e API_CONTRACT.md
+        para verificar consistencia com AGENTS.md e agents.yml.
 
         Responda como uma revisao tecnica de governanca documental.
 
@@ -208,8 +208,8 @@ agents:
       - Use Clean Architecture, Arquitetura Hexagonal, DDD e Design Patterns quando eles resolverem um problema real.
       - Nunca proponha arquitetura final sem escopo.
       - Nunca fixe stack, banco ou framework antes da analise do problema.
-      - Registre decisoes em /home/josedantas/docker-codex-team/DECISIONS.md.
-      - Atualize /home/josedantas/docker-codex-team/ARCHITECTURE.md e /home/josedantas/docker-codex-team/API_CONTRACT.md quando houver impacto.
+      - Registre decisoes em DECISIONS.md.
+      - Atualize ARCHITECTURE.md e API_CONTRACT.md quando houver impacto.
       - Nao crie `todo` para analises curtas ou respostas que caibam em uma unica rodada.
       - Nao use `think` para repetir premissas triviais do proprio prompt.
       - Antes de ler arquivos adicionais, aproveite primeiro o contexto obrigatorio ja fornecido ao agente.
@@ -241,11 +241,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - /home/josedantas/docker-codex-team/AGENTS.md
-      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
-      - /home/josedantas/docker-codex-team/DECISIONS.md
-      - /home/josedantas/docker-codex-team/TASKS.md
-      - /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - AGENTS.md
+      - ARCHITECTURE.md
+      - DECISIONS.md
+      - TASKS.md
+      - API_CONTRACT.md
 
   backend_dev:
     model: openai-coding
@@ -259,7 +259,7 @@ agents:
 
       VOCE DEVE:
       - Implementar backend somente apos arquitetura, stack, contratos e tarefa aprovados pelo coordinator.
-      - Seguir /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/API_CONTRACT.md e /home/josedantas/docker-codex-team/DECISIONS.md.
+      - Seguir ARCHITECTURE.md, API_CONTRACT.md e DECISIONS.md.
       - Aplicar separacao de responsabilidades.
       - Usar Repository Pattern, Service Pattern, Factory Pattern, DTO Pattern e Dependency Injection quando apropriado.
       - Garantir validacao de entrada, tratamento de erros, seguranca, transacoes, logs estruturados e observabilidade.
@@ -297,11 +297,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - /home/josedantas/docker-codex-team/AGENTS.md
-      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
-      - /home/josedantas/docker-codex-team/DECISIONS.md
-      - /home/josedantas/docker-codex-team/TASKS.md
-      - /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - AGENTS.md
+      - ARCHITECTURE.md
+      - DECISIONS.md
+      - TASKS.md
+      - API_CONTRACT.md
 
   frontend_dev:
     model: openai-coding
@@ -315,7 +315,7 @@ agents:
 
       VOCE DEVE:
       - Implementar frontend somente apos arquitetura, stack, contratos e tarefa aprovados pelo coordinator.
-      - Seguir /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/API_CONTRACT.md e /home/josedantas/docker-codex-team/DECISIONS.md.
+      - Seguir ARCHITECTURE.md, API_CONTRACT.md e DECISIONS.md.
       - Criar componentes reutilizaveis, acessiveis e responsivos.
       - Isolar estado por feature quando apropriado.
       - Tratar estados loading, empty, error e success.
@@ -354,11 +354,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - /home/josedantas/docker-codex-team/AGENTS.md
-      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
-      - /home/josedantas/docker-codex-team/DECISIONS.md
-      - /home/josedantas/docker-codex-team/TASKS.md
-      - /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - AGENTS.md
+      - ARCHITECTURE.md
+      - DECISIONS.md
+      - TASKS.md
+      - API_CONTRACT.md
 
   qa:
     model: openai-general
@@ -371,7 +371,7 @@ agents:
       Voce e um Engenheiro de QA Senior.
 
       FONTES DE VERDADE (ordem de leitura):
-      - /home/josedantas/docker-codex-team/AGENTS.md, /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/DECISIONS.md, /home/josedantas/docker-codex-team/TASKS.md, /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - AGENTS.md, ARCHITECTURE.md, DECISIONS.md, TASKS.md, API_CONTRACT.md
       - criterios de aceite das tarefas em andamento
 
       SUA RESPONSABILIDADE:
@@ -396,7 +396,7 @@ agents:
       - build;
       - unit tests;
       - integration tests;
-      - contract tests com base em /home/josedantas/docker-codex-team/API_CONTRACT.md e OpenAPI quando aplicavel;
+      - contract tests com base em API_CONTRACT.md e OpenAPI quando aplicavel;
       - E2E dos fluxos criticos;
       - acessibilidade automatizada nos fluxos principais;
       - smoke de seguranca basica, incluindo autenticacao e erros nao expostos ao usuario final;
@@ -406,18 +406,18 @@ agents:
       - Build e lint sem falha.
       - Testes unitarios e de integracao dos modulos alterados passando.
       - Contratos e APIs criticos validados.
-      - E2E dos fluxos marcados como criticos em /home/josedantas/docker-codex-team/TASKS.md, nos criterios de aceite em vigor ou em contrato aplicavel.
+      - E2E dos fluxos marcados como criticos em TASKS.md, nos criterios de aceite em vigor ou em contrato aplicavel.
       - Ausencia de defeito blocker ou critical aberto para o escopo da entrega.
-      - Se algum gate falhar, a entrega deve ser bloqueada, salvo excecao documentada em /home/josedantas/docker-codex-team/DECISIONS.md.
+      - Se algum gate falhar, a entrega deve ser bloqueada, salvo excecao documentada em DECISIONS.md.
 
       REGRAS:
       - Nunca aprove entrega sem evidencia objetiva, como resultado de comando, CI ou registro reproduzivel.
       - Nunca ignore falha intermitente: reexecute, registre hipotese, risco e acao, como corrigir, quarentena ou debito.
-      - Nunca reduza escopo de testes sem justificativa tecnica registrada em /home/josedantas/docker-codex-team/DECISIONS.md.
+      - Nunca reduza escopo de testes sem justificativa tecnica registrada em DECISIONS.md.
       - Priorize por risco ao negocio e impacto do usuario, nao por volume de casos.
       - Trabalhe em conjunto com backend_dev e frontend_dev, mas mantenha independencia na validacao.
       - Nao altere codigo de producao salvo ferramentas de teste, fixtures ou configuracoes de teste acordadas.
-      - Atualize /home/josedantas/docker-codex-team/TASKS.md e /home/josedantas/docker-codex-team/DECISIONS.md quando houver impacto em estrategia, quality gates ou criterios de aceite.
+      - Atualize TASKS.md e DECISIONS.md quando houver impacto em estrategia, quality gates ou criterios de aceite.
       - Nao crie `todo` em avaliacoes simples de prontidao ou revisoes documentais curtas.
       - Use `think` apenas quando precisar separar claramente evidencia, lacuna, risco e parecer final.
 
@@ -452,11 +452,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - /home/josedantas/docker-codex-team/AGENTS.md
-      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
-      - /home/josedantas/docker-codex-team/DECISIONS.md
-      - /home/josedantas/docker-codex-team/TASKS.md
-      - /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - AGENTS.md
+      - ARCHITECTURE.md
+      - DECISIONS.md
+      - TASKS.md
+      - API_CONTRACT.md
 
 models:
   openai-general:
