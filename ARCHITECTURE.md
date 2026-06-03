@@ -51,11 +51,11 @@ Quando a arquitetura for aprovada, este documento devera registrar:
 
 ### 4.1 Papeis
 
-- `root`: coordena o fluxo, valida qualidade, integra entregas, bloqueia decisoes frageis e garante documentacao.
-- `architect`: analisa o problema, modela dominio, avalia trade-offs e propoe arquitetura apos receber o escopo.
-- `backend_dev`: implementa backend somente apos aprovacao da arquitetura, da stack e dos contratos.
-- `frontend_dev`: implementa frontend somente apos aprovacao da estrategia de UX, arquitetura frontend, stack e contratos.
-- `qa`: define estrategia, implementa e executa a frente de testes, registra evidencias, reporta defeitos e emite parecer objetivo sobre quality gates.
+- `root`: coordena o fluxo, valida qualidade, integra entregas, bloqueia decisoes frageis, garante documentacao e consolida a comunicacao com julgamento tecnico proprio.
+- `architect`: analisa o problema, modela dominio, avalia trade-offs e propoe arquitetura apos receber o escopo, com comparacao explicita de alternativas e riscos.
+- `backend_dev`: implementa backend somente apos aprovacao da arquitetura, da stack e dos contratos, com foco em rigor de implementacao, testabilidade e observabilidade.
+- `frontend_dev`: implementa frontend somente apos aprovacao da estrategia de UX, arquitetura frontend, stack e contratos, com foco em fluxo real do usuario, acessibilidade e consistencia de estado.
+- `qa`: define estrategia, implementa e executa a frente de testes, registra evidencias, reporta defeitos e emite parecer objetivo sobre quality gates, com base em risco e evidencia objetiva.
 
 ### 4.2 Docker Agent Oficial
 
@@ -76,7 +76,7 @@ Regra operacional:
 - `architect`, `backend_dev`, `frontend_dev` e `qa` devem atuar dentro dos limites definidos em `agents.yml`.
 - O Docker Agent gerencia a coordenacao e as delegacoes.
 - O provider principal do Docker Agent e OpenAI, autenticado por `OPENAI_API_KEY`.
-- O modelo configurado em `agents.yml` e `openai-main`, apontando para `gpt-5.4`.
+- Os modelos configurados em `agents.yml` podem ser separados por responsabilidade, com alias distintos para coordenacao generalista e coding.
 - Nenhuma implementacao deve iniciar sem escopo, arquitetura aprovada e tarefa rastreavel.
 
 Fluxo operacional:

@@ -320,3 +320,131 @@ Complementos operacionais aceitos para o agente `qa`:
 - na ausencia de codigo, ambiente ou dados, o agente deve entregar plano de testes, premissas, riscos e criterios de pronto para teste;
 - o agente deve incluir testes exploratorios guiados por risco e smoke de seguranca basica quando aplicavel;
 - defeitos devem ser registrados com passos, esperado versus atual, severidade e evidencia.
+
+## ADR-012: Root deve consolidar com julgamento tecnico e comunicacao natural
+
+Status: Aceita.
+
+Decisao:
+O agente `root` deve continuar como coordinator principal, mas com instrucao explicita para atuar tambem como sintetizador tecnico, revisor critico e comunicador principal com o usuario.
+
+Motivo:
+Um coordinator que apenas delega e repassa respostas tende a produzir saidas superficiais, mecanicas e pouco uteis para tomada de decisao. O valor do `root` aumenta quando ele filtra ruido, identifica conflitos, prioriza achados e entrega conclusoes acionaveis em linguagem natural.
+
+Beneficios:
+- melhora a qualidade percebida das respostas;
+- reduz respostas burocraticas ou excessivamente genericas;
+- aumenta a clareza para o usuario final;
+- preserva a especializacao dos sub-agentes sem perder unidade tecnica;
+- fortalece o papel do coordinator como dono da entrega.
+
+Trade-offs:
+- o `root` passa a consumir mais contexto antes de responder;
+- respostas podem ficar um pouco mais longas em temas complexos;
+- exige maior disciplina para distinguir consolidacao de invencao.
+
+Alternativas descartadas:
+- Manter o `root` apenas como roteador de tarefas: descartado por baixo valor analitico.
+- Transferir a responsabilidade de comunicacao principal para um sub-agent: descartado para nao fragmentar a interface com o usuario.
+
+## ADR-013: Comandos do root devem exigir saida analitica e nao burocratica
+
+Status: Aceita.
+
+Decisao:
+Os comandos embutidos do agente `root`, como `status`, `prepare_scope` e `validate_docs`, devem instruir explicitamente o coordinator a responder com sintese executiva, priorizacao, julgamento tecnico e recomendacoes acionaveis.
+
+Motivo:
+Mesmo com um bom prompt principal, comandos curtos e genericos tendem a induzir respostas mecanicas, superficiais ou excessivamente checklist-driven. Ajustar os comandos melhora a qualidade da interacao nos fluxos mais frequentes sem alterar o papel do agente.
+
+Beneficios:
+- aumenta consistencia de tom e profundidade;
+- reduz respostas burocraticas;
+- melhora a utilidade pratica dos comandos prontos;
+- reforca o papel do `root` como dono da analise final.
+
+Trade-offs:
+- respostas desses comandos podem ficar um pouco maiores;
+- exige cuidado para nao repetir contexto desnecessario.
+
+Alternativas descartadas:
+- Deixar apenas o prompt principal carregar esse comportamento: descartado por baixa garantia de aderencia nos comandos embutidos.
+
+## ADR-014: Todo o time deve seguir padrao de clareza, rigor e sintese acionavel
+
+Status: Aceita.
+
+Decisao:
+Refinar os prompts de `architect`, `backend_dev`, `frontend_dev` e `qa` para que todos os agentes entreguem respostas mais claras, humanas, tecnicamente densas e orientadas a decisao, sem perder suas especializacoes.
+
+Motivo:
+Melhorar apenas o `root` nao resolve o problema por completo quando os sub-agentes continuam respondendo de forma superficial, burocratica ou pouco acionavel. A qualidade final do coordinator depende da qualidade do material que ele recebe.
+
+Beneficios:
+- melhora a qualidade media das delegacoes;
+- reduz necessidade de retrabalho do `root` para reinterpretar respostas fracas;
+- aumenta consistencia de comunicacao em todo o time;
+- reforca cultura de evidencias, trade-offs e conclusoes acionaveis.
+
+Trade-offs:
+- prompts mais longos consomem mais contexto;
+- agentes podem responder com mais detalhe em tarefas complexas;
+- exige disciplina para manter densidade sem prolixidade.
+
+Alternativas descartadas:
+- Melhorar apenas o `root`: descartado por atuar apenas na consolidacao final.
+- Criar agentes novos apenas para comunicacao: descartado por aumentar complexidade operacional sem necessidade.
+
+## ADR-015: Separar modelo generalista e modelo de coding por papel
+
+Status: Aceita.
+
+Decisao:
+Adotar estrategia de modelos por responsabilidade no `agents.yml`: `root`, `architect` e `qa` passam a usar `openai-general` apontando para `gpt-5.4`, enquanto `backend_dev` e `frontend_dev` passam a usar `openai-coding` apontando para `gpt-5.2-codex`.
+
+Motivo:
+O coordinator e os agentes de analise e validacao dependem mais de julgamento amplo, sintese e comparacao de alternativas. Ja os agentes de implementacao tendem a se beneficiar mais de um modelo otimizado para coding agentic. Separar por papel melhora aderencia tecnica sem misturar expectativas de comportamento em um unico modelo.
+
+Beneficios:
+- melhora especializacao por agente;
+- aproxima implementacao do comportamento de coding agent;
+- preserva um modelo generalista forte para coordenacao, arquitetura e QA;
+- reduz dependencia exclusiva de prompt para extrair comportamento adequado.
+
+Trade-offs:
+- aumenta dependencia da disponibilidade de mais de um deployment no provider;
+- pode elevar custo operacional;
+- adiciona mais uma dimensao de configuracao para manter.
+
+Risco operacional:
+- em ambientes Azure OpenAI ou gateways compativeis, o valor do campo `model` pode precisar corresponder ao nome do deployment exposto no ambiente, e nao apenas ao identificador canonico do modelo;
+- se `gpt-5.4` ou `gpt-5.2-codex` nao estiverem publicados no endpoint atual, a execucao falhara ate o deployment ser ajustado.
+
+Alternativas descartadas:
+- Manter um unico modelo para todos os agentes: descartado por menor especializacao.
+- Trocar apenas o `root`: descartado por gerar ganho parcial.
+
+## ADR-016: Reduzir overhead operacional de think, todo e delegacao
+
+Status: Aceita.
+
+Decisao:
+Refinar os prompts principalmente de `root`, `architect` e `qa` para reduzir uso desnecessario de `think`, `todo`, releitura de contexto e delegacao excessiva em tarefas simples ou analises pontuais.
+
+Motivo:
+Os testes mostraram melhora clara na qualidade textual, mas tambem evidenciaram overhead operacional acima do necessario. Em especial, houve criacao de todos e uso de raciocinio interno em perguntas que poderiam ser respondidas de forma mais direta.
+
+Beneficios:
+- respostas mais rapidas;
+- menor consumo de tokens;
+- menor poluicao operacional durante execucao;
+- mais foco em resultado do que em processo interno;
+- melhor equilibrio entre profundidade e eficiencia.
+
+Trade-offs:
+- reduz espaco para rastreamento interno em tarefas pequenas;
+- exige julgamento melhor sobre quando planejar e quando responder diretamente.
+
+Alternativas descartadas:
+- Manter o comportamento atual: descartado por custo e latencia desnecessarios.
+- Remover `think` e `todo` por completo: descartado porque eles ainda sao uteis em tarefas complexas.

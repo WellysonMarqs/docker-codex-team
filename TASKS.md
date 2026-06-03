@@ -41,11 +41,16 @@ Status: Concluida.
 - [x] Validar toolsets com `docker agent debug toolsets agents.yml`.
 - [ ] Validar build de imagem quando a CLI local expuser `docker agent build`.
 - [x] Configurar OpenAI como provider principal via `OPENAI_API_KEY`.
-- [ ] Validar `OPENAI_API_KEY` disponivel no ambiente local.
-- [ ] Validar `docker agent run agents.yml --dry-run` com provider OpenAI.
+- [x] Validar `OPENAI_API_KEY` disponivel no ambiente local.
+- [x] Validar `docker agent run agents.yml --dry-run` com provider OpenAI.
 - [x] Atualizar `ARCHITECTURE.md`.
 - [x] Atualizar `DECISIONS.md`.
 - [x] Atualizar `TASKS.md`.
+- [x] Refinar o prompt do `root` para consolidacao tecnica e comunicacao mais clara sem alterar o papel de coordinator.
+- [x] Refinar os comandos embutidos do `root` para respostas menos burocraticas e mais analiticas.
+- [x] Refinar os prompts de `architect`, `backend_dev`, `frontend_dev` e `qa` para elevar qualidade de analise, clareza e utilidade das entregas.
+- [x] Separar o mapeamento de modelos por papel entre coordenacao generalista e implementacao orientada a coding.
+- [x] Refinar os prompts para reduzir overhead de `think`, `todo`, releitura de contexto e delegacao em tarefas simples.
 
 ### Etapa 1: Receber escopo detalhado do problema
 
