@@ -35,7 +35,6 @@ https://refactoring.guru/pt-br/design-patterns
 
 Sempre atualizar:
 
-- README.md
 - TASKS.md
 - DECISIONS.md
 - ARCHITECTURE.md

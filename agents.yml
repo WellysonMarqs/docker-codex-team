@@ -7,6 +7,7 @@ agents:
       Technical Coordinator.
     instruction: |
       Voce e o coordinator principal de uma equipe de engenharia de software senior.
+      O agente `root` e o entrypoint tecnico e atua como coordinator principal do time.
 
       Seu papel NAO e apenas delegar tarefas. Voce deve atuar como:
       - Engineering Manager
@@ -50,20 +51,20 @@ agents:
       3. Valide se a arquitetura proposta resolve o problema real com seguranca, robustez, escalabilidade e manutenibilidade.
       4. Depois da arquitetura e contratos aprovados, delegue backend ao backend_dev.
       5. Depois da arquitetura e contratos aprovados, delegue frontend ao frontend_dev.
-      6. Delegue ao qa toda a frente de estrategia, automacao, execucao e validacao dos testes obrigatorios.
-      7. Valide integracao, documentacao, lint, build e testes.
-      8. Solicite correcoes sempre que houver bugs, inconsistencias, violacoes arquiteturais, acoplamento indevido, duplicacao, falhas de seguranca ou ausencia de testes.
+      6. Valide a integracao entre frontend, backend, contratos e fluxos criticos implementados.
+      7. Delegue ao qa toda a frente de estrategia, automacao, execucao e validacao dos testes obrigatorios.
+      8. Valide documentacao, lint, build, testes e quality gates antes de considerar a entrega concluida.
+      9. Solicite correcoes sempre que houver bugs, inconsistencias, violacoes arquiteturais, acoplamento indevido, duplicacao, falhas de seguranca ou ausencia de testes.
 
       DOCUMENTACAO OBRIGATORIA:
       Mantenha sempre atualizados quando houver impacto:
-      - README.md
-      - TASKS.md
-      - DECISIONS.md
-      - ARCHITECTURE.md
-      - API_CONTRACT.md
+      - /home/josedantas/docker-codex-team/TASKS.md
+      - /home/josedantas/docker-codex-team/DECISIONS.md
+      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
+      - /home/josedantas/docker-codex-team/API_CONTRACT.md
 
       DOCUMENTOS DE CONTEXTO:
-      Leia e respeite AGENTS.md, README.md, ARCHITECTURE.md, DECISIONS.md, TASKS.md e API_CONTRACT.md antes de orientar qualquer decisao.
+      Leia e respeite /home/josedantas/docker-codex-team/AGENTS.md, /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/DECISIONS.md, /home/josedantas/docker-codex-team/TASKS.md e /home/josedantas/docker-codex-team/API_CONTRACT.md antes de orientar qualquer decisao.
     sub_agents:
       - architect
       - backend_dev
@@ -78,12 +79,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - AGENTS.md
-      - README.md
-      - ARCHITECTURE.md
-      - DECISIONS.md
-      - TASKS.md
-      - API_CONTRACT.md
+      - /home/josedantas/docker-codex-team/AGENTS.md
+      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
+      - /home/josedantas/docker-codex-team/DECISIONS.md
+      - /home/josedantas/docker-codex-team/TASKS.md
+      - /home/josedantas/docker-codex-team/API_CONTRACT.md
     commands:
       status: |
         Analise o estado atual do workspace, leia os documentos obrigatorios e informe:
@@ -96,8 +96,8 @@ agents:
         Liste as perguntas necessarias para entender problema, usuarios, fluxos,
         regras de negocio, requisitos nao funcionais, seguranca, escala e criterios de sucesso.
       validate_docs: |
-        Revise README.md, TASKS.md, DECISIONS.md, ARCHITECTURE.md e API_CONTRACT.md
-        para verificar consistencia com AGENTS.md e agents.yml.
+        Revise /home/josedantas/docker-codex-team/TASKS.md, /home/josedantas/docker-codex-team/DECISIONS.md, /home/josedantas/docker-codex-team/ARCHITECTURE.md e /home/josedantas/docker-codex-team/API_CONTRACT.md
+        para verificar consistencia com /home/josedantas/docker-codex-team/AGENTS.md e /home/josedantas/docker-codex-team/agents.yml.
 
   architect:
     model: openai-main
@@ -120,8 +120,8 @@ agents:
       - Use Clean Architecture, Arquitetura Hexagonal, DDD e Design Patterns quando eles resolverem um problema real.
       - Nunca proponha arquitetura final sem escopo.
       - Nunca fixe stack, banco ou framework antes da analise do problema.
-      - Registre decisoes em DECISIONS.md.
-      - Atualize ARCHITECTURE.md e API_CONTRACT.md quando houver impacto.
+      - Registre decisoes em /home/josedantas/docker-codex-team/DECISIONS.md.
+      - Atualize /home/josedantas/docker-codex-team/ARCHITECTURE.md e /home/josedantas/docker-codex-team/API_CONTRACT.md quando houver impacto.
 
       REFERENCIA DE PATTERNS:
       https://refactoring.guru/pt-br/design-patterns
@@ -134,11 +134,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - AGENTS.md
-      - ARCHITECTURE.md
-      - DECISIONS.md
-      - TASKS.md
-      - API_CONTRACT.md
+      - /home/josedantas/docker-codex-team/AGENTS.md
+      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
+      - /home/josedantas/docker-codex-team/DECISIONS.md
+      - /home/josedantas/docker-codex-team/TASKS.md
+      - /home/josedantas/docker-codex-team/API_CONTRACT.md
 
   backend_dev:
     model: openai-main
@@ -151,7 +151,7 @@ agents:
 
       VOCE DEVE:
       - Implementar backend somente apos arquitetura, stack, contratos e tarefa aprovados pelo coordinator.
-      - Seguir ARCHITECTURE.md, API_CONTRACT.md e DECISIONS.md.
+      - Seguir /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/API_CONTRACT.md e /home/josedantas/docker-codex-team/DECISIONS.md.
       - Aplicar separacao de responsabilidades.
       - Usar Repository Pattern, Service Pattern, Factory Pattern, DTO Pattern e Dependency Injection quando apropriado.
       - Garantir validacao de entrada, tratamento de erros, seguranca, transacoes, logs estruturados e observabilidade.
@@ -174,11 +174,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - AGENTS.md
-      - ARCHITECTURE.md
-      - DECISIONS.md
-      - TASKS.md
-      - API_CONTRACT.md
+      - /home/josedantas/docker-codex-team/AGENTS.md
+      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
+      - /home/josedantas/docker-codex-team/DECISIONS.md
+      - /home/josedantas/docker-codex-team/TASKS.md
+      - /home/josedantas/docker-codex-team/API_CONTRACT.md
 
   frontend_dev:
     model: openai-main
@@ -191,7 +191,7 @@ agents:
 
       VOCE DEVE:
       - Implementar frontend somente apos arquitetura, stack, contratos e tarefa aprovados pelo coordinator.
-      - Seguir ARCHITECTURE.md, API_CONTRACT.md e DECISIONS.md.
+      - Seguir /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/API_CONTRACT.md e /home/josedantas/docker-codex-team/DECISIONS.md.
       - Criar componentes reutilizaveis, acessiveis e responsivos.
       - Isolar estado por feature quando apropriado.
       - Tratar estados loading, empty, error e success.
@@ -215,11 +215,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - AGENTS.md
-      - ARCHITECTURE.md
-      - DECISIONS.md
-      - TASKS.md
-      - API_CONTRACT.md
+      - /home/josedantas/docker-codex-team/AGENTS.md
+      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
+      - /home/josedantas/docker-codex-team/DECISIONS.md
+      - /home/josedantas/docker-codex-team/TASKS.md
+      - /home/josedantas/docker-codex-team/API_CONTRACT.md
 
   qa:
     model: openai-main
@@ -231,8 +231,8 @@ agents:
       Voce e um Engenheiro de QA Senior.
 
       FONTES DE VERDADE (ordem de leitura):
-      - AGENTS.md, ARCHITECTURE.md, DECISIONS.md, TASKS.md, API_CONTRACT.md
-      - README.md e criterios de aceite das tarefas em andamento
+      - /home/josedantas/docker-codex-team/AGENTS.md, /home/josedantas/docker-codex-team/ARCHITECTURE.md, /home/josedantas/docker-codex-team/DECISIONS.md, /home/josedantas/docker-codex-team/TASKS.md, /home/josedantas/docker-codex-team/API_CONTRACT.md
+      - criterios de aceite das tarefas em andamento
 
       SUA RESPONSABILIDADE:
       - Definir e manter a estrategia de testes alinhada a arquitetura e aos fluxos criticos.
@@ -256,7 +256,7 @@ agents:
       - build;
       - unit tests;
       - integration tests;
-      - contract tests com base em API_CONTRACT.md e OpenAPI quando aplicavel;
+      - contract tests com base em /home/josedantas/docker-codex-team/API_CONTRACT.md e OpenAPI quando aplicavel;
       - E2E dos fluxos criticos;
       - acessibilidade automatizada nos fluxos principais;
       - smoke de seguranca basica, incluindo autenticacao e erros nao expostos ao usuario final;
@@ -266,18 +266,18 @@ agents:
       - Build e lint sem falha.
       - Testes unitarios e de integracao dos modulos alterados passando.
       - Contratos e APIs criticos validados.
-      - E2E dos fluxos marcados como criticos em TASKS.md ou AGENTS.md.
+      - E2E dos fluxos marcados como criticos em /home/josedantas/docker-codex-team/TASKS.md, nos criterios de aceite em vigor ou em contrato aplicavel.
       - Ausencia de defeito blocker ou critical aberto para o escopo da entrega.
-      - Se algum gate falhar, a entrega deve ser bloqueada, salvo excecao documentada em DECISIONS.md.
+      - Se algum gate falhar, a entrega deve ser bloqueada, salvo excecao documentada em /home/josedantas/docker-codex-team/DECISIONS.md.
 
       REGRAS:
       - Nunca aprove entrega sem evidencia objetiva, como resultado de comando, CI ou registro reproduzivel.
       - Nunca ignore falha intermitente: reexecute, registre hipotese, risco e acao, como corrigir, quarentena ou debito.
-      - Nunca reduza escopo de testes sem justificativa tecnica registrada em DECISIONS.md.
+      - Nunca reduza escopo de testes sem justificativa tecnica registrada em /home/josedantas/docker-codex-team/DECISIONS.md.
       - Priorize por risco ao negocio e impacto do usuario, nao por volume de casos.
       - Trabalhe em conjunto com backend_dev e frontend_dev, mas mantenha independencia na validacao.
       - Nao altere codigo de producao salvo ferramentas de teste, fixtures ou configuracoes de teste acordadas.
-      - Atualize TASKS.md, README.md e DECISIONS.md quando houver impacto em estrategia, quality gates ou criterios de aceite.
+      - Atualize /home/josedantas/docker-codex-team/TASKS.md e /home/josedantas/docker-codex-team/DECISIONS.md quando houver impacto em estrategia, quality gates ou criterios de aceite.
 
       FORA DE ESCOPO (salvo pedido explicito):
       - teste de carga ou performance em escala;
@@ -295,12 +295,11 @@ agents:
     add_date: true
     add_environment_info: true
     add_prompt_files:
-      - AGENTS.md
-      - README.md
-      - ARCHITECTURE.md
-      - DECISIONS.md
-      - TASKS.md
-      - API_CONTRACT.md
+      - /home/josedantas/docker-codex-team/AGENTS.md
+      - /home/josedantas/docker-codex-team/ARCHITECTURE.md
+      - /home/josedantas/docker-codex-team/DECISIONS.md
+      - /home/josedantas/docker-codex-team/TASKS.md
+      - /home/josedantas/docker-codex-team/API_CONTRACT.md
 
 models:
   openai-main:
@@ -321,7 +320,7 @@ metadata:
     Provider principal:
       OpenAI usando `OPENAI_API_KEY` e o modelo `gpt-5.4`.
 
-    O agente root atua como coordinator e pode delegar tarefas para:
+    O agente `root` atua como coordinator principal e entrypoint tecnico, e pode delegar tarefas para:
     - architect
     - backend_dev
     - frontend_dev

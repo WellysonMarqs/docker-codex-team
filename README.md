@@ -35,8 +35,14 @@ docker agent version
 
 Configurar a chave no PowerShell antes de executar o time:
 
-```bash
+```powershell
 $env:OPENAI_API_KEY="sua_chave_aqui"
+```
+
+Em shell compativel com Unix:
+
+```bash
+export OPENAI_API_KEY="sua_chave_aqui"
 ```
 
 Opcionalmente, persista a variavel no perfil ou no ambiente do sistema para nao precisar exportar a cada sessao.

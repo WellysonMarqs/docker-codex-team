@@ -207,7 +207,7 @@ Estrategia minima esperada quando houver codigo:
 - Frontend unitario: componentes, services, pipes, guards e validators.
 - Frontend integracao: fluxos com mocks, stubs ou ambientes de teste aderentes a arquitetura escolhida.
 - Contrato: compatibilidade entre os contratos de integracao aprovados e os componentes consumidores.
-- E2E: fluxos criticos com Playwright.
+- E2E: fluxos criticos com ferramenta aderente a stack e aos requisitos operacionais aprovados.
 - Acessibilidade: validacao automatizada nos fluxos principais.
 
 Entregaveis minimos esperados do QA:

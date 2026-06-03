@@ -2,7 +2,7 @@
 
 ## Estado Atual
 
-Workspace analisado em 2026-05-26.
+Workspace analisado em 2026-06-01.
 
 Arquivos encontrados:
 
@@ -144,7 +144,6 @@ Status: Bloqueada por Etapa 3.
 - [ ] Configurar lint frontend com apoio do qa.
 - [ ] Configurar build backend com apoio do qa.
 - [ ] Configurar build frontend com apoio do qa.
-- [ ] Atualizar `README.md`.
 
 Gate de saida:
 
@@ -171,7 +170,6 @@ Status: Bloqueada por Etapa 4.
 - [ ] Implementar health checks.
 - [ ] Garantir testabilidade da camada backend para o qa.
 - [ ] Atualizar `API_CONTRACT.md`.
-- [ ] Atualizar `README.md`.
 
 Gate de saida:
 
@@ -200,7 +198,6 @@ Status: Bloqueada por Etapa 4.
 - [ ] Implementar acessibilidade.
 - [ ] Implementar responsividade.
 - [ ] Garantir testabilidade da camada frontend para o qa.
-- [ ] Atualizar `README.md`.
 
 Gate de saida:
 
@@ -251,8 +248,8 @@ Responsaveis principais: `coordinator` e `qa`.
 Status: Bloqueada por Etapa 4.
 
 - [ ] Configurar pipeline de CI.
-- [ ] Configurar cache de dependencias Java.
-- [ ] Configurar cache de dependencias Node.
+- [ ] Configurar cache de dependencias da stack backend aprovada.
+- [ ] Configurar cache de dependencias da stack frontend aprovada.
 - [ ] Executar lint backend no CI.
 - [ ] Executar lint frontend no CI.
 - [ ] Executar build backend no CI.
@@ -262,7 +259,6 @@ Status: Bloqueada por Etapa 4.
 - [ ] Executar testes de contrato no CI.
 - [ ] Executar E2E quando aplicavel.
 - [ ] Executar scan de dependencias.
-- [ ] Documentar pipeline em `README.md`.
 
 Gate de saida:
 
