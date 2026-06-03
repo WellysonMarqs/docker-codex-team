@@ -35,6 +35,20 @@ Pre-requisitos:
 docker agent version
 ```
 
+Instalar o Docker Agent, quando ele ainda nao estiver disponivel no ambiente:
+
+```bash
+brew install docker-agent
+```
+
+No Windows com Winget:
+
+```powershell
+winget install Docker.Agent
+```
+
+Observacao: no Docker Desktop 4.63 ou superior, o Docker Agent ja vem incluido.
+
 Configurar a chave no PowerShell antes de executar o time:
 
 ```powershell
