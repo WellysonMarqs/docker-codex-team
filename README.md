@@ -117,3 +117,34 @@ Observacao: a CLI local validada neste workspace e `docker agent v1.57.0`; ela e
 - `DECISIONS.md`: decisoes tecnicas registradas.
 - `TASKS.md`: organizacao das tarefas.
 - `API_CONTRACT.md`: contratos de API, pendentes ate existir escopo e modelagem.
+
+## Memoria Persistente dos Agentes
+
+Os agentes mantem documentacao operacional e aprendizagem reaproveitavel em banco SQL Server local.
+
+Banco principal:
+
+- instancia nativa do host em `localhost:1433`
+- banco `MemoriaAgentes`
+
+Arquivos relacionados:
+
+- `tools/agent_memory.py`: CLI de operacao
+- `memory/sqlserver/bootstrap.sql`: criacao do banco
+- `memory/sqlserver/schema.sql`: schema principal em SQL Server
+- `memory/AGENT_MEMORY.md`: guia operacional
+
+Objetivo:
+
+- persistir contexto recorrente do projeto;
+- persistir regras e licoes aprendidas;
+- persistir melhorias aprovadas no fluxo dos agentes;
+- espelhar no banco o conteudo relevante da documentacao obrigatoria.
+
+Operacoes principais:
+
+```bash
+python3 tools/agent_memory.py --sqlserver-host host.docker.internal --sqlserver-target-port 1433 init
+python3 tools/agent_memory.py --sqlserver-host host.docker.internal --sqlserver-target-port 1433 search --agent shared --query documentacao
+python3 tools/agent_memory.py --sqlserver-host host.docker.internal --sqlserver-target-port 1433 stats
+```

@@ -265,6 +265,39 @@ Alternativas descartadas:
 - Criar quatro imagens diferentes: descartado porque Docker Agent ja suporta time multi-agent em um unico YAML.
 - Implementar codigo de aplicacao junto com configuracao de agentes: descartado para manter separacao de responsabilidades.
 
+## ADR-020: Memoria persistente dos agentes em SQL Server com schema em portugues
+
+Status: Aceita.
+
+Decisao:
+Usar a instancia SQL Server nativa local em `localhost:1433` como persistencia principal da memoria operacional dos agentes, com banco `MemoriaAgentes`, schema fisico em portugues e acesso por `tools/agent_memory.py`.
+
+Motivo:
+Os agentes precisam preservar documentacao relevante, regras, licoes aprendidas e melhorias aprovadas entre sessoes. Como ha uma instancia SQL Server local disponivel, faz mais sentido usar essa persistencia principal do que manter a memoria operacional apenas em arquivos ou em SQLite.
+
+Beneficios:
+
+- centraliza a memoria persistente em banco relacional aderente ao ambiente do usuario;
+- permite que documentacao e aprendizagem sejam consultadas de forma estruturada;
+- reduz perda de contexto entre sessoes;
+- melhora rastreabilidade por eventos;
+- mantem nomenclatura fisica do banco em portugues.
+
+Trade-offs:
+
+- a CLI ainda depende de um cliente `sqlcmd` executado em container auxiliar, porque o ambiente atual nao expõe cliente nativo local;
+- os arquivos obrigatorios continuam existindo no repositorio e precisam ser mantidos em sincronia conceitual com o banco;
+- os testes automatizados passam a depender de uma instancia SQL Server acessivel no ambiente.
+
+Alternativas descartadas:
+
+- manter memoria apenas em Markdown: descartado por baixa estrutura para busca e rastreabilidade;
+- usar SQLite como persistencia principal ou de suporte: descartado porque a instancia SQL Server local ja existe e atende melhor ao objetivo operacional;
+- migrar para MongoDB: descartado por nao haver necessidade forte de modelo documental flexivel neste momento.
+
+Diretriz complementar:
+Os nomes fisicos de tabelas e colunas do banco devem permanecer em portugues do Brasil.
+
 ## ADR-010: OpenAI como provider principal do Docker Agent
 
 Status: Aceita.

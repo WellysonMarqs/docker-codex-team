@@ -44,3 +44,71 @@ Quando o escopo for aprovado, este documento devera conter:
 - exemplos de request e response;
 - estrategia de versionamento;
 - requisitos de idempotencia quando aplicavel.
+
+## Contrato Operacional Interno: Memoria Persistente dos Agentes
+
+### Estado
+
+Aprovado para uso interno do workspace.
+
+### Persistencia principal
+
+- instancia SQL Server nativa local em `localhost:1433`
+- banco `MemoriaAgentes`
+- schema principal em `memory/sqlserver/schema.sql`
+
+### Tabelas fisicas
+
+- `memorias_agentes`
+- `eventos_memorias_agentes`
+
+### Colunas fisicas de `memorias_agentes`
+
+- `id`
+- `nome_agente`
+- `categoria`
+- `escopo`
+- `titulo`
+- `conteudo`
+- `tags`
+- `tipo_origem`
+- `referencia_origem`
+- `situacao`
+- `confianca`
+- `criado_em`
+- `atualizado_em`
+- `ultimo_uso_em`
+
+### Colunas fisicas de `eventos_memorias_agentes`
+
+- `id`
+- `memoria_id`
+- `acao`
+- `autor`
+- `observacao_evento`
+- `criado_em`
+
+### Finalidade funcional
+
+Esse contrato interno existe para que os agentes armazenem e consultem:
+
+- documentacao operacional relevante;
+- regras de trabalho;
+- licoes aprendidas;
+- melhorias aprovadas;
+- contexto reutilizavel do projeto.
+
+### Operacoes suportadas pela CLI
+
+- `init`
+- `upsert`
+- `search`
+- `list`
+- `show`
+- `touch`
+- `archive`
+- `stats`
+
+### Regra de sincronizacao
+
+Quando houver mudanca relevante em `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` ou `API_CONTRACT.md`, os agentes devem considerar se o conteudo precisa ser espelhado no banco como memoria reutilizavel.

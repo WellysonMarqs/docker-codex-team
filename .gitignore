@@ -12,3 +12,9 @@ dist/
 build/
 .angular/
 .gradle/
+.memory/*.db
+.memory/sqlserver.env
+__pycache__/
+*.pyc
+.idea/
+*.Zone.Identifier

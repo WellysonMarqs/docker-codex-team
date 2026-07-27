@@ -1,0 +1,17 @@
+services:
+  agent-memory-sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: agent-memory-sqlserver
+    restart: unless-stopped
+    env_file:
+      - .memory/sqlserver.env
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "${MSSQL_PORT:-14333}:1433"
+    volumes:
+      - agent-memory-sqlserver-data:/var/opt/mssql
+
+volumes:
+  agent-memory-sqlserver-data:

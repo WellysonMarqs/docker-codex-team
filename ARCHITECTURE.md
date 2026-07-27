@@ -266,6 +266,83 @@ Diretrizes obrigatorias:
 - rastreabilidade de erros frontend-backend;
 - tracing distribuido quando houver necessidade operacional.
 
+## 13. Memoria Persistente e Documentacao no Banco
+
+### 13.1 Objetivo
+
+O workspace passa a usar SQL Server como persistencia principal da memoria operacional dos agentes.
+
+Essa memoria deve armazenar:
+
+- contexto recorrente do projeto;
+- regras operacionais e arquiteturais;
+- licoes aprendidas;
+- melhorias aprovadas;
+- espelhamento do conteudo relevante da documentacao obrigatoria.
+
+### 13.2 Fonte oficial e espelhamento
+
+Os arquivos `TASKS.md`, `DECISIONS.md`, `ARCHITECTURE.md` e `API_CONTRACT.md` continuam sendo a interface documental legivel do repositorio.
+
+Ao mesmo tempo, os agentes devem manter no banco:
+
+- o conhecimento derivado desses documentos;
+- as atualizacoes relevantes de documentacao;
+- a aprendizagem adquirida durante o uso diario.
+
+Em outras palavras:
+
+- os arquivos Markdown continuam obrigatorios;
+- o banco SQL Server passa a ser a memoria persistente operacional;
+- a documentacao relevante deve ser espelhada e reutilizavel no banco.
+
+### 13.3 Persistencia aprovada
+
+Persistencia principal aprovada:
+
+- instancia SQL Server nativa local em `localhost:1433`;
+- banco `MemoriaAgentes`;
+- schema principal em `memory/sqlserver/schema.sql`;
+- cliente operacional via `tools/agent_memory.py`.
+
+### 13.4 Modelo fisico aprovado
+
+Tabelas principais em portugues:
+
+- `memorias_agentes`
+- `eventos_memorias_agentes`
+
+Colunas principais em portugues:
+
+- `nome_agente`
+- `categoria`
+- `escopo`
+- `titulo`
+- `conteudo`
+- `tipo_origem`
+- `referencia_origem`
+- `situacao`
+- `confianca`
+- `criado_em`
+- `atualizado_em`
+- `ultimo_uso_em`
+
+Tabela de eventos:
+
+- `memoria_id`
+- `acao`
+- `autor`
+- `observacao_evento`
+- `criado_em`
+
+### 13.5 Regra operacional
+
+Sempre que houver mudanca relevante em documentacao, regra, aprendizado ou melhoria:
+
+1. o arquivo obrigatorio correspondente deve ser atualizado;
+2. o conteudo reutilizavel deve ser persistido no banco;
+3. a memoria deve poder ser consultada por `search`, `list`, `show`, `touch` e `stats`.
+
 ## 13. Pendencias Antes da Arquitetura Final
 
 - Receber o escopo detalhado do problema.

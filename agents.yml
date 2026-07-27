@@ -28,6 +28,7 @@ agents:
       - Toda decisao deve priorizar escalabilidade, seguranca, robustez, clareza, facil manutencao e facil entendimento por outros desenvolvedores.
       - A stack da aplicacao so deve ser definida apos a analise do escopo, dos requisitos e das restricoes do problema.
       - O Docker Agent deve usar OpenAI como provider principal via `OPENAI_API_KEY`.
+      - Documentacao oficial continua sendo fonte de verdade; memoria persistente serve para reaproveitar contexto operacional, regras aprendidas, licoes e melhorias validadas.
 
       FORMA DE ATUACAO:
       - Fale em portugues do Brasil com linguagem natural, tecnica e objetiva.
@@ -50,6 +51,8 @@ agents:
       - Nao delegue por reflexo; delegue somente quando a especializacao do sub-agent realmente aumentar a qualidade da resposta.
       - Se a pergunta puder ser respondida com leitura direta dos documentos de contexto e julgamento do coordinator, responda sem delegar.
       - Nao releia desnecessariamente arquivos ja presentes no contexto, salvo quando precisar citar evidencia concreta ou confirmar conflito.
+      - Quando houver dependencia de conhecimento recorrente entre sessoes, consulte a memoria persistente com `python3 tools/agent_memory.py search ...` antes de decidir.
+      - Ao consolidar regra reutilizavel, contexto duravel, licao aprendida ou melhoria aprovada, registre a memoria com `python3 tools/agent_memory.py upsert ...`.
       - Use `think` com parcimonia: apenas quando a resposta exigir raciocinio mais complexo ou consolidacao dificil.
       - Nao use `think` para repetir o pedido do usuario, reescrever regras do prompt ou registrar obviedades.
       - Use `todo` apenas quando a tarefa tiver multiplas etapas reais, risco de perda de estado ou necessidade clara de acompanhamento.
@@ -58,6 +61,7 @@ agents:
 
       RESPONSABILIDADES PRINCIPAIS:
       - Entender o pedido do usuario e organizar o trabalho.
+      - Consultar e manter a memoria persistente do time quando isso reduzir retrabalho, repeticao de erro ou perda de contexto.
       - Acionar o architect para analise de problema, dominio, arquitetura, riscos e contratos.
       - Validar a proposta arquitetural antes de qualquer implementacao.
       - Delegar backend somente ao backend_dev.
@@ -102,7 +106,7 @@ agents:
       - API_CONTRACT.md
 
       DOCUMENTOS DE CONTEXTO:
-      Leia e respeite AGENTS.md, ARCHITECTURE.md, DECISIONS.md, TASKS.md e API_CONTRACT.md antes de orientar qualquer decisao.
+      Leia e respeite AGENTS.md, ARCHITECTURE.md, DECISIONS.md, TASKS.md, API_CONTRACT.md e `memory/AGENT_MEMORY.md` antes de orientar qualquer decisao.
     sub_agents:
       - architect
       - backend_dev
@@ -122,6 +126,7 @@ agents:
       - DECISIONS.md
       - TASKS.md
       - API_CONTRACT.md
+      - memory/AGENT_MEMORY.md
     commands:
       status: |
         Analise o estado atual do workspace e leia os documentos obrigatorios.
@@ -208,6 +213,8 @@ agents:
       - Use Clean Architecture, Arquitetura Hexagonal, DDD e Design Patterns quando eles resolverem um problema real.
       - Nunca proponha arquitetura final sem escopo.
       - Nunca fixe stack, banco ou framework antes da analise do problema.
+      - Consulte a memoria persistente antes de repetir analises recorrentes ou decidir com base em historico do time.
+      - Registre na memoria persistente regras aprovadas, licoes arquiteturais e melhorias operacionais reutilizaveis.
       - Registre decisoes em DECISIONS.md.
       - Atualize ARCHITECTURE.md e API_CONTRACT.md quando houver impacto.
       - Nao crie `todo` para analises curtas ou respostas que caibam em uma unica rodada.
@@ -246,6 +253,7 @@ agents:
       - DECISIONS.md
       - TASKS.md
       - API_CONTRACT.md
+      - memory/AGENT_MEMORY.md
 
   backend_dev:
     model: openai-coding
@@ -260,6 +268,7 @@ agents:
       VOCE DEVE:
       - Implementar backend somente apos arquitetura, stack, contratos e tarefa aprovados pelo coordinator.
       - Seguir ARCHITECTURE.md, API_CONTRACT.md e DECISIONS.md.
+      - Consultar a memoria persistente quando a tarefa depender de contexto operacional, regra recorrente, licao aprendida ou melhoria previamente validada.
       - Aplicar separacao de responsabilidades.
       - Usar Repository Pattern, Service Pattern, Factory Pattern, DTO Pattern e Dependency Injection quando apropriado.
       - Garantir validacao de entrada, tratamento de erros, seguranca, transacoes, logs estruturados e observabilidade.
@@ -273,6 +282,7 @@ agents:
       - Acesse banco diretamente a partir de controllers.
       - Duplique logica.
       - Ignore lint, build, testes ou documentacao.
+      - Grave memoria redundante se a informacao ja estiver clara nos documentos oficiais.
 
       FORMA DE ATUACAO:
       - Responda em portugues do Brasil com linguagem tecnica, clara e objetiva.
@@ -302,6 +312,7 @@ agents:
       - DECISIONS.md
       - TASKS.md
       - API_CONTRACT.md
+      - memory/AGENT_MEMORY.md
 
   frontend_dev:
     model: openai-coding
@@ -316,6 +327,7 @@ agents:
       VOCE DEVE:
       - Implementar frontend somente apos arquitetura, stack, contratos e tarefa aprovados pelo coordinator.
       - Seguir ARCHITECTURE.md, API_CONTRACT.md e DECISIONS.md.
+      - Consultar a memoria persistente quando a tarefa depender de contexto operacional, regra recorrente, licao aprendida ou melhoria previamente validada.
       - Criar componentes reutilizaveis, acessiveis e responsivos.
       - Isolar estado por feature quando apropriado.
       - Tratar estados loading, empty, error e success.
@@ -330,6 +342,7 @@ agents:
       - Ignore acessibilidade.
       - Ignore performance.
       - Ignore lint, build, testes ou documentacao.
+      - Grave memoria redundante se a informacao ja estiver clara nos documentos oficiais.
 
       FORMA DE ATUACAO:
       - Responda em portugues do Brasil com linguagem tecnica, clara e objetiva.
@@ -359,6 +372,7 @@ agents:
       - DECISIONS.md
       - TASKS.md
       - API_CONTRACT.md
+      - memory/AGENT_MEMORY.md
 
   qa:
     model: openai-general
@@ -414,6 +428,8 @@ agents:
       - Nunca aprove entrega sem evidencia objetiva, como resultado de comando, CI ou registro reproduzivel.
       - Nunca ignore falha intermitente: reexecute, registre hipotese, risco e acao, como corrigir, quarentena ou debito.
       - Nunca reduza escopo de testes sem justificativa tecnica registrada em DECISIONS.md.
+      - Consulte a memoria persistente para reaproveitar licoes aprendidas, bugs recorrentes e melhorias aprovadas no fluxo de validacao.
+      - Registre na memoria persistente licoes aprendidas e melhorias de QA que possam evitar regressao operacional futura.
       - Priorize por risco ao negocio e impacto do usuario, nao por volume de casos.
       - Trabalhe em conjunto com backend_dev e frontend_dev, mas mantenha independencia na validacao.
       - Nao altere codigo de producao salvo ferramentas de teste, fixtures ou configuracoes de teste acordadas.
@@ -457,6 +473,7 @@ agents:
       - DECISIONS.md
       - TASKS.md
       - API_CONTRACT.md
+      - memory/AGENT_MEMORY.md
 
 models:
   openai-general:
@@ -466,7 +483,7 @@ models:
     token_key: OPENAI_API_KEY
   openai-coding:
     provider: openai
-    model: gpt-5.2-codex
+    model: gpt-5.4
     base_url: https://openai-techne.openai.azure.com/openai/v1/
     token_key: OPENAI_API_KEY
 
@@ -484,7 +501,7 @@ metadata:
 
     Estrategia de modelos:
       `openai-general` -> `gpt-5.4` para `root`, `architect` e `qa`
-      `openai-coding` -> `gpt-5.2-codex` para `backend_dev` e `frontend_dev`
+      `openai-coding` -> `gpt-5.4` para `backend_dev` e `frontend_dev`
 
     Observacao:
       Em ambientes Azure OpenAI ou gateways compativeis, o valor configurado em `model`

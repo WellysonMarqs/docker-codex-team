@@ -16,6 +16,12 @@ Arquivos encontrados:
 
 Nao ha codigo de aplicacao, manifesto de dependencias, infraestrutura executavel ou suites de teste implementadas neste workspace.
 
+Atualizacao de contexto em 2026-07-27:
+
+- a memoria persistente dos agentes passou a usar SQL Server nativo local;
+- documentacao relevante e aprendizagem operacional devem ser espelhadas no banco `MemoriaAgentes`;
+- o schema fisico do banco deve permanecer com tabelas e colunas em portugues.
+
 ## Premissas Atualizadas
 
 - Arquitetura final: somente apos envio e analise do escopo detalhado do problema.
@@ -453,3 +459,25 @@ Documentacao:
 - Nenhuma tarefa com codigo deve ser concluida sem lint, build, testes e documentacao.
 - Alteracoes de arquitetura devem gerar entrada em `DECISIONS.md`.
 - Alteracoes de API devem atualizar `API_CONTRACT.md`.
+
+## TASK-008: Manter memoria persistente e documentacao operacional no SQL Server
+
+Responsaveis: `coordinator`, `architect` e `qa`.
+
+Status: Em andamento.
+
+Objetivo:
+
+- manter a memoria operacional dos agentes no banco `MemoriaAgentes`;
+- persistir documentacao relevante e aprendizagem no SQL Server;
+- garantir schema fisico com tabelas e colunas em portugues;
+- manter consistencia entre documentacao em arquivo e conhecimento persistido no banco.
+
+Criterios de aceite:
+
+- [ ] SQL Server local identificado como persistencia principal;
+- [ ] banco `MemoriaAgentes` documentado;
+- [ ] tabelas `memorias_agentes` e `eventos_memorias_agentes` documentadas;
+- [ ] regra de espelhamento da documentacao obrigatoria registrada;
+- [ ] testes da CLI continuam passando;
+- [ ] documentacao obrigatoria atualizada.
