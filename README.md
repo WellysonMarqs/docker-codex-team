@@ -82,6 +82,23 @@ Executar com prompt inicial:
 docker agent run agents.yml "Analise o estado atual do projeto e conduza o workflow multi-agent."
 ```
 
+### Contexto da sessao e carregamento da documentacao
+
+O `agents.yml` nao usa `add_prompt_files` para a documentacao do projeto. Esse
+recurso relê os arquivos completos em toda rodada. Cada agente agora faz um
+bootstrap dos documentos obrigatorios na primeira ativacao da propria sessao e
+reutiliza o contexto nas rodadas seguintes. A releitura fica restrita a casos
+de alteracao, conflito ou pedido explicito de revisao atualizada.
+
+Para manter o contexto entre comandos separados, retome a mesma sessao:
+
+```bash
+docker agent run agents.yml --session <session-id>
+```
+
+Sem `--session`, o Docker Agent cria uma nova sessao e o bootstrap inicial sera
+executado novamente, conforme esperado.
+
 Executar com o escopo do sistema de auditoria de customizacoes:
 
 ```bash
